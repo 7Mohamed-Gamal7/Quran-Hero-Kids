@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{5FC49DD1-C83A-403F-9100-73F7C1C5BD44}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5B14A0C2-2BA2-4929-B8B7-A3D3B6F4F4F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuranHero.Api", "backend\src\QuranHero.Api\QuranHero.Api.csproj", "{5ED6B015-A75D-4F2E-8A36-3ED7C4467BEC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7C63BC7F-AD9C-4E55-86BF-49EB346048FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuranHero.Api.Tests", "backend\tests\QuranHero.Api.Tests\QuranHero.Api.Tests.csproj", "{76739074-238A-4C02-B000-785883D04109}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5ED6B015-A75D-4F2E-8A36-3ED7C4467BEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5ED6B015-A75D-4F2E-8A36-3ED7C4467BEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5ED6B015-A75D-4F2E-8A36-3ED7C4467BEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5ED6B015-A75D-4F2E-8A36-3ED7C4467BEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76739074-238A-4C02-B000-785883D04109}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76739074-238A-4C02-B000-785883D04109}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76739074-238A-4C02-B000-785883D04109}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76739074-238A-4C02-B000-785883D04109}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5B14A0C2-2BA2-4929-B8B7-A3D3B6F4F4F5} = {5FC49DD1-C83A-403F-9100-73F7C1C5BD44}
+		{5ED6B015-A75D-4F2E-8A36-3ED7C4467BEC} = {5B14A0C2-2BA2-4929-B8B7-A3D3B6F4F4F5}
+		{7C63BC7F-AD9C-4E55-86BF-49EB346048FA} = {5FC49DD1-C83A-403F-9100-73F7C1C5BD44}
+		{76739074-238A-4C02-B000-785883D04109} = {7C63BC7F-AD9C-4E55-86BF-49EB346048FA}
+	EndGlobalSection
+EndGlobal

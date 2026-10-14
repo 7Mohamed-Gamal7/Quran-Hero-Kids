@@ -57,10 +57,11 @@
 
 - [ ] إنشاء حل .NET بمشاريع Domain/Application/Infrastructure/Api واختبارات xUnit.
 - [ ] إضافة Flutter skeleton مع Riverpod واختبار smoke لأول شاشة.
-- [ ] إعداد GitHub Actions للبناء والاختبار وformat/lint.
-- [ ] تعريف `/health` وإعدادات التطوير عبر متغيرات البيئة، دون أسرار داخل Git.
+- [ ] إعداد GitHub Actions للبناء والاختبار وformat/lint. (لم يُرفع workflow لأن صلاحية GitHub الحالية رفضت إنشاء ملفات تحت `.github/workflows/`.)
+- [x] إنشاء مشروع API أولي وتعريف `/health` وإضافة اختبار تكاملي يعيد 200 وحالة `ok`.
+- [ ] استكمال إعدادات التطوير عبر متغيرات البيئة، دون أسرار داخل Git.
 
-**اختبارات القبول:** `dotnet test` و`flutter test` ينجحان في CI؛ `/health` يعيد 200؛ لا أسرار ضمن المستودع.
+**اختبارات القبول:** عند اكتمال المرحلة، ينجح `dotnet test` و`flutter test` في CI؛ `/health` يعيد 200؛ لا أسرار ضمن المستودع. تحقق محليًا الآن: `dotnet test QuranHeroKids.sln` ينجح (اختبار واحد)، لكن Flutter وCI لم يُجهزا بعد.
 
 ### المرحلة 2: الهوية والأسرة
 
