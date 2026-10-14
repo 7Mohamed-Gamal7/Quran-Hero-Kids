@@ -13,6 +13,12 @@ secrets/
 build/
 .flutter-plugins
 .flutter-plugins-dependencies
+**/local.properties
+**/key.properties
+**/google-services.json
+**/GoogleService-Info.plist
+*.jks
+*.keystore
 
 # .NET
 bin/

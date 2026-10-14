@@ -2,7 +2,7 @@
 
 منصة تعليمية عائلية تساعد الأطفال على حفظ القرآن الكريم ومراجعته واختبار إتقانهم، مع أدوات متابعة وتحفيز مناسبة للعمر وإشراف الوالدين.
 
-> هذا المستودع في مرحلة التأسيس والتنفيذ الأولي: توجد وثائق المنتج والبنية، ومشروع ASP.NET Core أولي مع `/health` واختبار تكاملي. لم يبدأ بعد تطبيق الهاتف أو منطق المنتج.
+> المشروع في مرحلة تأسيس MVP: توجد واجهات Flutter أولية، API لملفات الأطفال وسجل الجلسات، ووثائق المنتج والبنية. المصادقة الفعلية ومحتوى القرآن لم يربطا بعد.
 
 ## الهدف
 
@@ -28,6 +28,7 @@
 ## وثائق المشروع
 
 - [ملخص المنتج وMVP](docs/product/PRD.md)
+- [تقييم مصادر النص والتلاوات](docs/product/content-sources.md)
 - [خطة التنفيذ المرحلية](docs/superpowers/plans/2026-10-14-quran-hero-kids.md)
 - [البنية وقرارات التصميم](docs/architecture/architecture.md)
 - [مخطط البيانات وERD](docs/architecture/data-model.md)
@@ -38,9 +39,9 @@
 - [x] إنشاء مستودع خاص.
 - [x] تحويل طلب المنتج إلى خطة ومراحل قابلة للتتبع.
 - [x] تحديد MVP والحدود الحساسة المتعلقة بالأطفال والقرآن.
-- [x] إنشاء API أولي واختبار تكاملي لـ `/health`؛ `dotnet test QuranHeroKids.sln` ناجح محليًا.
-- [ ] بناء طبقات Domain/Application/Infrastructure وإعداد Firebase وOpenAPI.
-- [ ] إنشاء تطبيق Flutter واختبار أول شاشة؛ Flutter SDK غير متاح حاليًا.
+- [x] بناء طبقات API لملفات الأطفال وجلسات التعلّم، مع مصادقة Firebase JWT واختبارات عزل.
+- [x] إنشاء تطبيق Flutter عربي أولي مع تنقل واختبارات واجهة.
+- [ ] إعداد Firebase client واعتمادات النشر، واختيار مصدر المحتوى بعد الموافقة على شروطه.
 - [ ] بناء شرائح MVP واختبارها مرحليًا.
 
 ## قرارات تأسيسية
@@ -52,4 +53,4 @@
 
 ## التطوير
 
-راجع الخطة في `docs/superpowers/plans/2026-10-14-quran-hero-kids.md` قبل البدء بتنفيذ كل مرحلة. لتشغيل API والاختبارات يلزم .NET 8 SDK: `dotnet run --project backend/src/QuranHero.Api` و`dotnet test QuranHeroKids.sln`. لم يُختبر تطبيق Flutter بعد لعدم توفر SDK في بيئة التأسيس.
+راجع الخطة في `docs/superpowers/plans/2026-10-14-quran-hero-kids.md` قبل تنفيذ كل مرحلة. لتشغيل API محليًا يلزم .NET 8 SDK: `dotnet run --project backend/src/QuranHero.Api`؛ قاعدة التطوير SQLite تُعرّف فقط في `appsettings.Development.json`. اختبارات الخادم: `dotnet test QuranHeroKids.sln`. لتشغيل الهاتف: `cd mobile && flutter pub get && flutter run --dart-define=API_BASE_URL=https://<عنوان-api>`. لا يصدر التطبيق token حقيقيًا حتى إعداد Firebase وربط `TokenProvider`. للإنتاج يلزم تعيين `Firebase__ProjectId` و`ConnectionStrings__QuranHero` في مخزن أسرار البيئة؛ ويستخدم SQL Server/Azure SQL migrations عند بدء التشغيل. لا تضع قيم الاعتمادات في Git.

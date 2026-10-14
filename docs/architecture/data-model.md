@@ -1,6 +1,6 @@
 # نموذج البيانات الأولي وERD
 
-> مخطط مفاهيمي للإصدار الأول، وليس migration جاهزًا للإنتاج. تُحسم أنواع الأعمدة والفهارس بعد معرفة أحجام البيانات وسياسة الاحتفاظ ومزود المحتوى.
+> هذا ERD تصور كامل مرحلي للمنتج. المخطط المنفذ الآن يغطي ملفات الأطفال وجلسات التعلم فقط؛ راجع EF migration في `backend/src/QuranHero.Infrastructure/Persistence/Migrations/` للتفاصيل الحالية. تستخدم ملفات الأطفال فئة عمرية عامة ولا تخزن تاريخ ميلاد دقيقًا.
 
 ```mermaid
 erDiagram
@@ -28,7 +28,7 @@ erDiagram
     uuid id PK
     uuid parent_id FK
     string display_name
-    date birth_date
+    string age_band
     string level_code
     string interests_json
     datetime created_at
