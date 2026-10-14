@@ -30,6 +30,7 @@
 - [ملخص المنتج وMVP](docs/product/PRD.md)
 - [تقييم مصادر النص والتلاوات](docs/product/content-sources.md)
 - [خطة التنفيذ المرحلية](docs/superpowers/plans/2026-10-14-quran-hero-kids.md)
+- [سجل المهام اليومي وحالة التنفيذ](docs/TASKS.md)
 - [البنية وقرارات التصميم](docs/architecture/architecture.md)
 - [مخطط البيانات وERD](docs/architecture/data-model.md)
 - [قائمة التحقق للخصوصية والأمان](docs/architecture/security.md)
