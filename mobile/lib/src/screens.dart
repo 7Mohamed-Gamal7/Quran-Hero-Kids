@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
 import 'features/children/presentation/child_profiles_screen.dart';
+import 'features/study/presentation/study_session_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -211,13 +212,7 @@ class _ActionCard extends StatelessWidget {
 class LearnScreen extends StatelessWidget {
   const LearnScreen({super.key});
   @override
-  Widget build(BuildContext context) => _FeaturePage(
-      title: 'التعلّم والمراجعة',
-      icon: Icons.menu_book,
-      description:
-          'اختر جلسة حفظ أو مراجعة عندما يصبح مصدر القرآن والتلاوة المعتمد متصلًا بالتطبيق.',
-      notice: 'فهرس السور والصوت غير مضمّنين بعد؛ لن نعرض نصًا قرآنيًا قبل توثيق المصدر والترخيص والتحقق من سلامة النص.',
-      actions: const ['جلسة حفظ', 'مراجعة يومية', 'خطة التكرار']);
+  Widget build(BuildContext context) => const StudySessionScreen();
 }
 
 class TestsScreen extends StatelessWidget {
