@@ -58,21 +58,132 @@ public sealed class StudySessionsEndpointTests : IClassFixture<IntegrationTestFa
         Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
     }
 
-    [Fact]
-    public async Task RecordSession_RejectsInvalidKindAndDuration()
+    [Theory]
+    [InlineData("unknown", 60)]
+    [InlineData("revision", 0)]
+    [InlineData("revision", 28801)]
+    public async Task RecordSession_RejectsInvalidKindAndDuration(string kind, int durationSeconds)
     {
         var owner = $"parent-{Guid.NewGuid():N}";
-        using var createChild = NewRequest(HttpMethod.Post, "/api/v1/children", owner);
-        createChild.Content = JsonContent.Create(new { name = "Child" });
-        using var childResponse = await _client.SendAsync(createChild);
-        var child = await childResponse.Content.ReadFromJsonAsync<ChildResponse>();
-        Assert.NotNull(child);
-
-        var path = $"/api/v1/children/{child.Id}/study-sessions";
+        var childId = await CreateChildAsync(owner);
+        var path = $"/api/v1/children/{childId}/study-sessions";
         using var invalid = NewRequest(HttpMethod.Post, path, owner);
-        invalid.Content = JsonContent.Create(new { clientEventId = Guid.NewGuid(), kind = "unknown", durationSeconds = 0, occurredAt = DateTimeOffset.UtcNow });
+        invalid.Content = JsonContent.Create(new
+        {
+            clientEventId = Guid.NewGuid(),
+            kind,
+            durationSeconds,
+            occurredAt = DateTimeOffset.UtcNow
+        });
         using var response = await _client.SendAsync(invalid);
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(28800)]
+    public async Task RecordSession_AcceptsDurationBoundaries(int durationSeconds)
+    {
+        var owner = $"parent-{Guid.NewGuid():N}";
+        var childId = await CreateChildAsync(owner);
+        using var request = NewRequest(HttpMethod.Post,
+            $"/api/v1/children/{childId}/study-sessions", owner);
+        request.Content = JsonContent.Create(new
+        {
+            clientEventId = Guid.NewGuid(),
+            kind = "test",
+            durationSeconds,
+            occurredAt = DateTimeOffset.UtcNow
+        });
+
+        using var response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var session = await response.Content.ReadFromJsonAsync<SessionResponse>();
+        Assert.NotNull(session);
+        Assert.Equal(durationSeconds, session.DurationSeconds);
+    }
+
+    [Fact]
+    public async Task RecordSession_RejectsEmptyEventIdAndMissingOccurredAt()
+    {
+        var owner = $"parent-{Guid.NewGuid():N}";
+        var childId = await CreateChildAsync(owner);
+        var path = $"/api/v1/children/{childId}/study-sessions";
+
+        using var emptyEvent = NewRequest(HttpMethod.Post, path, owner);
+        emptyEvent.Content = JsonContent.Create(new
+        {
+            clientEventId = Guid.Empty,
+            kind = "revision",
+            durationSeconds = 60,
+            occurredAt = DateTimeOffset.UtcNow
+        });
+        using var emptyEventResponse = await _client.SendAsync(emptyEvent);
+        Assert.Equal(HttpStatusCode.BadRequest, emptyEventResponse.StatusCode);
+
+        using var missingTime = NewRequest(HttpMethod.Post, path, owner);
+        missingTime.Content = JsonContent.Create(new
+        {
+            clientEventId = Guid.NewGuid(),
+            kind = "revision",
+            durationSeconds = 60
+        });
+        using var missingTimeResponse = await _client.SendAsync(missingTime);
+        Assert.Equal(HttpStatusCode.BadRequest, missingTimeResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task RecordSession_RejectsOccurredAtTooFarInFuture()
+    {
+        var owner = $"parent-{Guid.NewGuid():N}";
+        var childId = await CreateChildAsync(owner);
+        using var request = NewRequest(HttpMethod.Post,
+            $"/api/v1/children/{childId}/study-sessions", owner);
+        request.Content = JsonContent.Create(new
+        {
+            clientEventId = Guid.NewGuid(),
+            kind = "revision",
+            durationSeconds = 60,
+            occurredAt = DateTimeOffset.UtcNow.AddMinutes(5).AddSeconds(1)
+        });
+
+        using var response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task ListSessions_EnforcesInclusiveLimitRange()
+    {
+        var owner = $"parent-{Guid.NewGuid():N}";
+        var childId = await CreateChildAsync(owner);
+        var path = $"/api/v1/children/{childId}/study-sessions";
+
+        foreach (var validLimit in new[] { 1, 100 })
+        {
+            using var response = await _client.SendAsync(NewRequest(
+                HttpMethod.Get, $"{path}?limit={validLimit}", owner));
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        foreach (var invalidLimit in new[] { 0, 101 })
+        {
+            using var response = await _client.SendAsync(NewRequest(
+                HttpMethod.Get, $"{path}?limit={invalidLimit}", owner));
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+    }
+
+    private async Task<Guid> CreateChildAsync(string owner)
+    {
+        using var request = NewRequest(HttpMethod.Post, "/api/v1/children", owner);
+        request.Content = JsonContent.Create(new { name = "Child" });
+        using var response = await _client.SendAsync(request);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var child = await response.Content.ReadFromJsonAsync<ChildResponse>();
+        Assert.NotNull(child);
+        return child.Id;
     }
 
     private static HttpRequestMessage NewRequest(HttpMethod method, string uri, string uid)

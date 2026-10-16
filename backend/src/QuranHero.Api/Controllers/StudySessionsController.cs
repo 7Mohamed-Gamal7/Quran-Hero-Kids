@@ -15,6 +15,9 @@ public sealed class StudySessionsController(IStudySessionService service) : Cont
 {
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyList<StudySessionView>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IReadOnlyList<StudySessionView>>> List(
         Guid childId,
         [FromQuery, Range(1, 100)] int limit = 30,
@@ -28,7 +31,10 @@ public sealed class StudySessionsController(IStudySessionService service) : Cont
 
     [HttpPost]
     [ProducesResponseType(typeof(StudySessionView), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<StudySessionView>> Record(
         Guid childId,
         RecordStudySessionRequest request,

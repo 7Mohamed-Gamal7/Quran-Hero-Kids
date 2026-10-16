@@ -14,6 +14,8 @@ public sealed class ChildrenController(IChildProfileService service) : Controlle
 {
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyList<ChildProfileView>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<IReadOnlyList<ChildProfileView>>> List(
         [FromQuery] bool includeArchived = false,
         CancellationToken cancellationToken = default)
@@ -25,6 +27,8 @@ public sealed class ChildrenController(IChildProfileService service) : Controlle
 
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(ChildProfileView), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ChildProfileView>> Get(
         Guid id,
@@ -39,7 +43,8 @@ public sealed class ChildrenController(IChildProfileService service) : Controlle
 
     [HttpPost]
     [ProducesResponseType(typeof(ChildProfileView), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ChildProfileView>> Create(CreateChildRequest request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.Name))
@@ -55,6 +60,8 @@ public sealed class ChildrenController(IChildProfileService service) : Controlle
 
     [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(ChildProfileView), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ChildProfileView>> Update(Guid id, UpdateChildRequest request, CancellationToken cancellationToken)
     {
@@ -72,6 +79,7 @@ public sealed class ChildrenController(IChildProfileService service) : Controlle
     [HttpPost("{id:guid}/archive")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Archive(Guid id, CancellationToken cancellationToken)
     {

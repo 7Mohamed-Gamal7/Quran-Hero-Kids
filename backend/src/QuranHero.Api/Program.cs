@@ -6,6 +6,7 @@ using QuranHero.Api.Auth;
 using QuranHero.Application;
 using QuranHero.Infrastructure;
 using QuranHero.Infrastructure.Persistence;
+using QuranHero.Api.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,12 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Quran Hero Kids API",
+        Version = "v1",
+        Description = "API لإدارة ملفات الأسرة وجلسات تعلم الأطفال."
+    });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -28,13 +35,7 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Firebase ID token: Bearer {token}"
     });
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        [new OpenApiSecurityScheme
-        {
-            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-        }] = Array.Empty<string>()
-    });
+    options.OperationFilter<AuthorizeOperationFilter>();
 });
 
 var app = builder.Build();
@@ -48,7 +49,7 @@ using (var scope = app.Services.CreateScope())
         await db.Database.MigrateAsync();
 }
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -60,6 +61,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapGet("/health", () => Results.Ok(new HealthResponse("ok")))
+    .Produces<HealthResponse>(StatusCodes.Status200OK)
+    .AllowAnonymous()
     .WithName("GetHealth")
     .WithTags("System");
 
