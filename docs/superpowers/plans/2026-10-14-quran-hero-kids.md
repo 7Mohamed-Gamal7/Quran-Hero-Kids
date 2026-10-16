@@ -61,6 +61,7 @@
 - [x] إضافة Flutter skeleton عربي مع Riverpod واختبارات smoke للواجهة والتنقل.
 - [ ] إعداد GitHub Actions للبناء والاختبار وformat/lint. (لم يُرفع workflow لأن صلاحية GitHub الحالية رفضت إنشاء ملفات تحت `.github/workflows/`.)
 - [x] تعريف `/health` وإضافة اختبار تكاملي يعيد 200 وحالة `ok`.
+- [x] توثيق عقد API في OpenAPI v1 مع Bearer للمسارات المحمية واختبارات تكامل للـschema والاستجابات؛ Swagger متاح في Development/Testing فقط.
 - [ ] استكمال إعدادات التطوير عبر متغيرات البيئة، دون أسرار داخل Git.
 
 **اختبارات القبول:** تحقق محليًا: `dotnet test QuranHeroKids.sln` و`cd mobile && flutter analyze && flutter test` ينجحان. إعداد CI ما زال مفتوحًا لأن اعتماد GitHub رفض رفع workflow دون صلاحية `workflows`.
