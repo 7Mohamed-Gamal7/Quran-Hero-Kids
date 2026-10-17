@@ -34,6 +34,7 @@
 - [البنية وقرارات التصميم](docs/architecture/architecture.md)
 - [مخطط البيانات وERD](docs/architecture/data-model.md)
 - [قائمة التحقق للخصوصية والأمان](docs/architecture/security.md)
+- [إجراء ترحيلات SQL للإنتاج](docs/operations/database-migrations.md)
 
 ## حالة التأسيس
 
@@ -56,4 +57,4 @@
 
 ## التطوير
 
-راجع الخطة في `docs/superpowers/plans/2026-10-14-quran-hero-kids.md` قبل تنفيذ كل مرحلة. لتشغيل API محليًا يلزم .NET 8 SDK: `dotnet run --project backend/src/QuranHero.Api`؛ قاعدة التطوير SQLite تُعرّف فقط في `appsettings.Development.json`. في Development/Testing يمكن فتح Swagger UI على `/swagger` أو مواصفة JSON على `/swagger/v1/swagger.json`؛ الوثائق غير مفعلة في Production. اختبارات الخادم: `dotnet test QuranHeroKids.sln`. لتشغيل الهاتف: `cd mobile && flutter pub get && flutter run --dart-define=API_BASE_URL=https://<عنوان-api>`. لا يصدر التطبيق token حقيقيًا حتى إعداد Firebase وربط `TokenProvider`. للإنتاج يلزم تعيين `Firebase__ProjectId` و`ConnectionStrings__QuranHero` في مخزن أسرار البيئة؛ ويستخدم SQL Server/Azure SQL migrations عند بدء التشغيل. لا تضع قيم الاعتمادات في Git.
+راجع الخطة في `docs/superpowers/plans/2026-10-14-quran-hero-kids.md` قبل تنفيذ كل مرحلة. لتشغيل API محليًا يلزم .NET 8 SDK: `dotnet run --project backend/src/QuranHero.Api`؛ قاعدة التطوير SQLite تُعرّف فقط في `appsettings.Development.json`. في Development/Testing يمكن فتح Swagger UI على `/swagger` أو مواصفة JSON على `/swagger/v1/swagger.json`؛ الوثائق غير مفعلة في Production. اختبارات الخادم: `dotnet test QuranHeroKids.sln`. لتشغيل الهاتف: `cd mobile && flutter pub get && flutter run --dart-define=API_BASE_URL=https://<عنوان-api>`. لا يصدر التطبيق token حقيقيًا حتى إعداد Firebase وربط `TokenProvider`. تتطلب كل بيئة غير Development/Testing `Firebase__ProjectId` و`ConnectionStrings__QuranHero` من مخزن أسرار البيئة، ويُرفض الإقلاع عند غيابهما. لا يطبق التطبيق migrations تلقائيًا عند بدء الإنتاج؛ ولّد سكربت SQL idempotent وراجعه وطبقه كخطوة نشر منفصلة وفق [إجراء الترحيلات](docs/operations/database-migrations.md). لا تضع قيم الاعتمادات أو سكربتات بيئة حقيقية في Git.
