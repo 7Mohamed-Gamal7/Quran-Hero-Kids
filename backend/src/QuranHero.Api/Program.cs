@@ -7,9 +7,11 @@ using QuranHero.Application;
 using QuranHero.Infrastructure;
 using QuranHero.Infrastructure.Persistence;
 using QuranHero.Api.OpenApi;
+using QuranHero.Api.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
+ProductionConfigurationValidator.Validate(builder.Configuration, builder.Environment);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddFirebaseAuthentication(builder.Configuration);
@@ -40,13 +42,11 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<QuranHeroDbContext>();
-    if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
-        await db.Database.EnsureCreatedAsync();
-    else
-        await db.Database.MigrateAsync();
+    await db.Database.EnsureCreatedAsync();
 }
 
 if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
