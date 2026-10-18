@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../children/data/children_providers.dart';
 import '../../children/domain/child_profile.dart';
 import '../../children/presentation/children_controller.dart';
 import '../data/study_sessions_providers.dart';
@@ -69,7 +70,8 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
                 ),
               );
             }
-            final childId = _effectiveChildId(items);
+            final activeChildId = ref.watch(activeChildIdProvider);
+            final childId = _effectiveChildId(items, activeChildId);
             final history = ref.watch(studySessionsForChildProvider(childId));
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -87,7 +89,12 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
                   ],
                   onChanged: _controlsLocked
                       ? null
-                      : (value) => setState(() => _selectedChildId = value),
+                      : (value) {
+                          if (value == null) return;
+                          ref.read(activeChildIdProvider.notifier).state =
+                              value;
+                          setState(() => _selectedChildId = value);
+                        },
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<StudySessionKind>(
@@ -213,7 +220,10 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
 
   bool get _controlsLocked => _isRunning || _pendingDraft != null || _isSaving;
 
-  String _effectiveChildId(List<ChildProfile> profiles) {
+  String _effectiveChildId(List<ChildProfile> profiles, String? activeChildId) {
+    if (profiles.any((profile) => profile.id == activeChildId)) {
+      return activeChildId!;
+    }
     if (profiles.any((profile) => profile.id == _selectedChildId)) {
       return _selectedChildId!;
     }

@@ -102,4 +102,21 @@ void main() {
     await tester.pump();
     expect(find.text('أدخل اسم الطفل'), findsOneWidget);
   });
+
+  testWidgets('selects an active child and identifies it accessibly',
+      (tester) async {
+    final repository = _FakeChildrenRepository(const [
+      ChildProfile(id: '1', name: 'ليان'),
+      ChildProfile(id: '2', name: 'عمر'),
+    ]);
+    await tester.pumpWidget(_testApp(repository));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('select-active-child-2')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('الطفل النشط'), findsOneWidget);
+    expect(find.byKey(const Key('select-active-child-2')), findsNothing);
+    expect(find.byKey(const Key('select-active-child-1')), findsOneWidget);
+  });
 }

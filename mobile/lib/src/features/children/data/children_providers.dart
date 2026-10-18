@@ -9,3 +9,5 @@ final childProfilesRepositoryProvider =
     Provider<ChildProfilesRepository>((ref) {
   return RestChildProfilesRepository(apiClient: ref.watch(apiClientProvider));
 });
+
+final activeChildIdProvider = StateProvider<String?>((ref) => null);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_exception.dart';
+import '../data/children_providers.dart';
 import '../domain/child_profile.dart';
 import 'children_controller.dart';
 
@@ -165,33 +166,60 @@ class _ProfileCard extends ConsumerWidget {
   final ChildProfile profile;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Card(
-        child: ListTile(
-          leading: CircleAvatar(
-            child: Text(
-                profile.name.isEmpty ? '?' : profile.name.characters.first),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isActive = ref.watch(activeChildIdProvider) == profile.id;
+    return Card(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: CircleAvatar(
+              child: Text(
+                  profile.name.isEmpty ? '?' : profile.name.characters.first),
+            ),
+            title: Text(profile.name),
+            subtitle: Text(profile.ageBand == null
+                ? 'الفئة العمرية غير محددة'
+                : 'الفئة العمرية: ${profile.ageBand} سنة'),
+            isThreeLine: false,
+            trailing: PopupMenuButton<String>(
+              tooltip: 'إجراءات ${profile.name}',
+              onSelected: (value) async {
+                if (value == 'edit') {
+                  await _edit(context, ref);
+                } else if (value == 'archive') {
+                  await _archive(context, ref);
+                }
+              },
+              itemBuilder: (context) => const [
+                PopupMenuItem(value: 'edit', child: Text('تعديل')),
+                PopupMenuItem(value: 'archive', child: Text('أرشفة')),
+              ],
+            ),
           ),
-          title: Text(profile.name),
-          subtitle: Text(profile.ageBand == null
-              ? 'الفئة العمرية غير محددة'
-              : 'الفئة العمرية: ${profile.ageBand} سنة'),
-          isThreeLine: false,
-          trailing: PopupMenuButton<String>(
-            tooltip: 'إجراءات ${profile.name}',
-            onSelected: (value) async {
-              if (value == 'edit') {
-                await _edit(context, ref);
-              } else if (value == 'archive') {
-                await _archive(context, ref);
-              }
-            },
-            itemBuilder: (context) => const [
-              PopupMenuItem(value: 'edit', child: Text('تعديل')),
-              PopupMenuItem(value: 'archive', child: Text('أرشفة')),
-            ],
+          Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: isActive
+                ? const Padding(
+                    padding: EdgeInsetsDirectional.only(end: 16, bottom: 8),
+                    child: Chip(
+                      avatar: Icon(Icons.check_circle_outline, size: 18),
+                      label: Text('الطفل النشط'),
+                    ),
+                  )
+                : TextButton.icon(
+                    key: Key('select-active-child-${profile.id}'),
+                    onPressed: () => ref
+                        .read(activeChildIdProvider.notifier)
+                        .state = profile.id,
+                    icon: const Icon(Icons.person_pin_circle_outlined),
+                    label: const Text('اختيار للتعلّم'),
+                  ),
           ),
-        ),
-      );
+        ],
+      ),
+    );
+  }
 
   Future<void> _edit(BuildContext context, WidgetRef ref) async {
     final draft = await showDialog<ChildProfileDraft>(

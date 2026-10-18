@@ -15,17 +15,24 @@ class _TestChildProfilesController extends ChildProfilesController {
             id: '123e4567-e89b-42d3-a456-426614174002',
             name: 'ليان',
             ageBand: '8-10'),
+        ChildProfile(
+            id: '123e4567-e89b-42d3-a456-426614174003',
+            name: 'عمر',
+            ageBand: '11-13'),
       ];
 }
 
 class _FakeStudySessionsRepository implements StudySessionsRepository {
   final attempts = <StudySessionDraft>[];
   final saved = <StudySessionRecord>[];
+  final listedChildIds = <String>[];
   bool failFirstRecord = false;
 
   @override
-  Future<List<StudySessionRecord>> list(String childId) async =>
-      List.unmodifiable(saved.reversed);
+  Future<List<StudySessionRecord>> list(String childId) async {
+    listedChildIds.add(childId);
+    return List.unmodifiable(saved.reversed);
+  }
 
   @override
   Future<StudySessionRecord> record(
@@ -62,6 +69,24 @@ Widget _app(
     );
 
 void main() {
+  testWidgets('changing the active child loads that child session history',
+      (tester) async {
+    final repository = _FakeStudySessionsRepository();
+    await tester.pumpWidget(_app(repository, DateTime.now));
+    await tester.pumpAndSettle();
+
+    expect(
+        repository.listedChildIds.last, '123e4567-e89b-42d3-a456-426614174002');
+    await tester.tap(
+        find.byKey(const Key('child-123e4567-e89b-42d3-a456-426614174002')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('عمر').last);
+    await tester.pumpAndSettle();
+
+    expect(
+        repository.listedChildIds.last, '123e4567-e89b-42d3-a456-426614174003');
+  });
+
   testWidgets('records a timed session and refreshes the recent history',
       (tester) async {
     var now = DateTime.utc(2026, 10, 15, 5);
