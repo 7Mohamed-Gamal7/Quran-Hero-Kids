@@ -58,7 +58,10 @@ void main() {
 
     expect(find.text('لا توجد ملفات أطفال بعد.'), findsOneWidget);
     expect(
-      find.widgetWithText(FilledButton, 'إضافة ملف طفل'),
+      find.ancestor(
+        of: find.text('إضافة ملف طفل'),
+        matching: find.bySubtype<FilledButton>(),
+      ),
       findsOneWidget,
     );
   });
