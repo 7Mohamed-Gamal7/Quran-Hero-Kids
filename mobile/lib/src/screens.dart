@@ -54,8 +54,8 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             _ActionCard(
                 icon: Icons.headphones_outlined,
-                title: 'استمع وتدرّب',
-                subtitle: 'اختر سورة وابدأ جلسة تعلّم',
+                title: 'جلسة تعلّم',
+                subtitle: 'سجّل مدة نشاطك؛ فهرس القرآن والتلاوة غير متاحين بعد',
                 onTap: () => ref.read(selectedTabProvider.notifier).state =
                     AppTab.learn),
             _ActionCard(

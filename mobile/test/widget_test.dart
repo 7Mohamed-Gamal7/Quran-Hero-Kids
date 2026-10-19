@@ -11,6 +11,12 @@ void main() {
     expect(find.text('هدف اليوم'), findsOneWidget);
     expect(find.text('التعلّم'), findsOneWidget);
     expect(find.text('الأسرة'), findsOneWidget);
+    expect(find.text('جلسة تعلّم'), findsOneWidget);
+    expect(
+      find.text('سجّل مدة نشاطك؛ فهرس القرآن والتلاوة غير متاحين بعد'),
+      findsOneWidget,
+    );
+    expect(find.text('اختر سورة وابدأ جلسة تعلّم'), findsNothing);
 
     await tester.tap(find.text('الأسرة'));
     await tester.pumpAndSettle();
