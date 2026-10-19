@@ -29,7 +29,7 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - Flutter defines a `TokenProvider`, but production wiring returns `MissingTokenProvider`; `ApiClient` blocks before sending if the token is absent/empty.
 - Firebase client initialization, parent email/password screens, sign-out, and auth gate are absent. No FlutterFire-generated options or platform app config were found.
 - Child profiles support list/create/edit/archive; study sessions have stable event IDs and backend idempotency. Active-child choice and retry drafts are memory-only; there is no durable outbox.
-- Dashboard progress, tests, and achievements include placeholders. Home copy suggests choosing a surah despite no approved Quran content being integrated.
+- Dashboard progress, tests, and achievements include placeholders. Follow-up on 2026-10-19 corrected the home action copy so it no longer implies that a surah/recitation index is available; metrics remain prototype values.
 - `docs/product/content-sources.md` states that no source is approved. No Quran content or audio was fetched or added.
 - Main Android manifest previously omitted INTERNET while debug/profile manifests contain it. This audit adds the permission to the main manifest; merged release-manifest verification remains pending.
 - Production database migrations are separate from application startup and documented in `docs/operations/database-migrations.md`. No database was accessed or migrated.
@@ -47,7 +47,7 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 | `git diff --check` | **Passed** | At audit checkpoint. |
 | Firebase package installation | **Blocked** | `flutter pub add firebase_core firebase_auth` was denied by the active permission gate. No workaround was attempted. |
 | Live Firebase/API test | **Not run / blocked** | No real Firebase options, test account, deployed API URL, or matching environment configuration. |
-| Android release build/merged manifest | **Not run** | Source manifest corrected; no APK/AAB claim is made. |
+| Android release build/merged manifest | **Not run** | Source manifest corrected; 2026-10-19 attempt stopped before Gradle because Android SDK is absent in the active environment. No APK/AAB claim is made. |
 
 ## Priority findings
 
