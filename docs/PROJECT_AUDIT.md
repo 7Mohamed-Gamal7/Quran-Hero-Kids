@@ -49,6 +49,13 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 | Live Firebase/API test | **Not run / blocked** | No real Firebase options, test account, deployed API URL, or matching environment configuration. |
 | Android release build/merged manifest | **Not run** | Source manifest corrected; 2026-10-19 attempt stopped before Gradle because Android SDK is absent in the active environment. No APK/AAB claim is made. |
 
+## Follow-up verification on 2026-10-20
+
+- `dotnet test`: **38/38 passed**; .NET whitespace verification passed; NuGet vulnerability scan reported no vulnerable packages against the configured sources.
+- Flutter: **16 tests passed**, analyzer reported no issues, and formatter found no changes in 23 Dart files.
+- A targeted widget test at 320×640 with 200% text scaling found a 52px horizontal overflow in the daily-goal title row. The title is now constrained to available width and the full-app test passes. This targeted check does not establish overall accessibility or release-device readiness.
+- Repository visibility was reported by GitHub as public (`isPrivate: false`); no visibility change was made because authorization to change it was not provided.
+
 ## Priority findings
 
 1. **P0 — Flutter parent Firebase auth is absent.** Preserve fail-closed behavior. Add Firebase only after the active install permission gate allows it and real generated options are provided/configured.
