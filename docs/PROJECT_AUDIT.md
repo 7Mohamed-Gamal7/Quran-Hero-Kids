@@ -52,8 +52,8 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 ## Follow-up verification on 2026-10-20
 
 - `dotnet test`: **38/38 passed**; .NET whitespace verification passed; NuGet vulnerability scan reported no vulnerable packages against the configured sources.
-- Flutter: **16 tests passed**, analyzer reported no issues, and formatter found no changes in 23 Dart files.
-- A targeted widget test at 320×640 with 200% text scaling found a 52px horizontal overflow in the daily-goal title row. The title is now constrained to available width and the full-app test passes. This targeted check does not establish overall accessibility or release-device readiness.
+- Flutter: **17 tests passed**, analyzer reported no issues, and formatter found no changes in 23 Dart files.
+- Targeted widget tests at 320×640 with 200% text scaling found a 52px horizontal overflow in the daily-goal title row and both horizontal (188px) and vertical (70px) overflow in the child-profile dialog. The title is now width-constrained; the dialog is scrollable and its age-band field is expanded with shorter labeling. The full suite passes. These targeted checks do not establish overall accessibility or release-device readiness.
 - Repository visibility was reported by GitHub as public (`isPrivate: false`); no visibility change was made because authorization to change it was not provided.
 
 ## Priority findings

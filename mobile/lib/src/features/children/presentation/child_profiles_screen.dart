@@ -290,6 +290,7 @@ class _ChildProfileDialogState extends State<_ChildProfileDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
+        scrollable: true,
         title:
             Text(widget.profile == null ? 'إضافة ملف طفل' : 'تعديل ملف الطفل'),
         content: Form(
@@ -312,9 +313,12 @@ class _ChildProfileDialogState extends State<_ChildProfileDialog> {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
+                isExpanded: true,
                 initialValue: _ageBand,
-                decoration:
-                    const InputDecoration(labelText: 'الفئة العمرية (اختياري)'),
+                decoration: const InputDecoration(
+                  labelText: 'الفئة العمرية',
+                  helperText: 'اختياري',
+                ),
                 items: const [
                   DropdownMenuItem(value: '5-7', child: Text('5–7 سنوات')),
                   DropdownMenuItem(value: '8-10', child: Text('8–10 سنوات')),
