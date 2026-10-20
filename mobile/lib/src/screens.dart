@@ -129,8 +129,12 @@ class _DailyGoalCard extends StatelessWidget {
           Row(children: [
             const Icon(Icons.wb_sunny_outlined, color: Colors.white),
             const SizedBox(width: 8),
-            Text('هدف اليوم',
-                style: TextStyle(color: Colors.white.withValues(alpha: .9)))
+            Expanded(
+              child: Text(
+                'هدف اليوم',
+                style: TextStyle(color: Colors.white.withValues(alpha: .9)),
+              ),
+            ),
           ]),
           const SizedBox(height: 13),
           const Text('خطوة صغيرة كل يوم',
