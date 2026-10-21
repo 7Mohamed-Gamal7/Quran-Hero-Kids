@@ -1,13 +1,13 @@
 # Technical Debt and Blockers
 
-**As of:** 2026-10-18 · Priorities are relative to a controlled beta and do not imply release approval.
+**As of:** 2026-10-21 · Priorities are relative to a controlled beta and do not imply release approval.
 
 | Priority | Finding | Impact | Evidence / prerequisite |
 |---|---|---|---|
 | P0 | Flutter client has no Firebase Auth integration | Parent cannot obtain a genuine Firebase ID token; protected calls correctly fail closed. | `mobile/lib/src/core/auth/token_provider.dart`, `network_providers.dart`, `api_client.dart`; pub.dev package install currently blocked by tool permission. |
 | P0 | No real Firebase client configuration or live test environment | Cannot verify generated options, email/password provider, token issuer/audience alignment, or end-to-end API behavior. | No generated options/platform files found; requires owner-controlled project configuration and API environment. |
 | P0 | Firebase project ID must match backend configuration | Mismatch causes valid client sessions to fail API authorization. | Backend reads `Firebase:ProjectId` in auth and non-development startup validation. |
-| P1 | Active child is in-memory and not owner-keyed | Selection is lost after restart; future persisted/cache state could bleed across parent changes unless scoped. | `activeChildIdProvider`; auth state must exist before safe UID-bound restoration. |
+| P1 | Active child is in-memory and not owner-keyed | Selection is lost after restart; future persisted/cache state could bleed across parent changes unless scoped. Archiving the active child now selects a remaining profile or clears selection when none remain. | `activeChildIdProvider`; archive-selection behavior is covered by widget tests; auth state must exist before safe UID-bound restoration. |
 | P1 | Study session retry is not durable | Process termination loses an unsent draft; no offline guarantee exists. | `study_session_screen.dart`; outbox needs retention/encryption decisions. |
 | P1 | Quran content is not approved or integrated | Learning screens cannot offer real surah/ayah/audio content. | `docs/product/content-sources.md`; owner approval and rights review are mandatory. |
 | P1 | Delete/export/retention is not executable | Families lack a verified lifecycle path for child/account data. | `docs/architecture/security.md`, `docs/architecture/data-model.md`; requires policy, market/legal review, and implementation. |

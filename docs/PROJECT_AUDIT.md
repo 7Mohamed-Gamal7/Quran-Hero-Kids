@@ -56,6 +56,12 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - Targeted widget tests at 320×640 with 200% text scaling found a 52px horizontal overflow in the daily-goal title row and both horizontal (188px) and vertical (70px) overflow in the child-profile dialog. The title is now width-constrained; the dialog is scrollable and its age-band field is expanded with shorter labeling. The full suite passes. These targeted checks do not establish overall accessibility or release-device readiness.
 - Repository visibility was reported by GitHub as public (`isPrivate: false`); no visibility change was made because authorization to change it was not provided.
 
+## Follow-up verification on 2026-10-21
+
+- Repository was synchronized before work: `master` matched `origin/master` at `6e0241c`, and the worktree was clean.
+- Baseline passed: 38 .NET tests, 17 Flutter tests, Flutter analyze and Dart format; final verification after the change passed 38 .NET tests and 19 Flutter tests, analyzer/format, .NET whitespace verification, and NuGet vulnerability scan (no vulnerable packages reported by configured sources).
+- A regression test first reproduced an inconsistent family UI after archiving the selected child: the active marker disappeared while the in-memory ID still referenced an archived profile. On successful archive, selection now moves to the first remaining profile or clears when none remain. Tests cover both cases. Selection remains memory-only and is not account-scoped pending parent authentication.
+
 ## Priority findings
 
 1. **P0 — Flutter parent Firebase auth is absent.** Preserve fail-closed behavior. Add Firebase only after the active install permission gate allows it and real generated options are provided/configured.

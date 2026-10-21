@@ -24,7 +24,7 @@
 
 ## Phase 2 — Family state and data lifecycle
 
-- Persist active child selection paired with parent UID; restore only for matching UID and a current, non-archived child. Clear on logout/account switch/stale selection.
+- Persist active child selection paired with parent UID; restore only for matching UID and a current, non-archived child. Clear on logout/account switch/stale selection. **Partial (2026-10-21):** archiving the active child now selects the first remaining active profile or clears selection when none remain; persistent UID-scoped restoration still awaits parent auth.
 - Define and implement account/child export, deletion, retention, and archive semantics; review applicable markets before beta.
 - Add privacy-safe account-scoped caching only where justified.
 
