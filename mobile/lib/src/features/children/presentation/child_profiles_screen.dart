@@ -255,9 +255,19 @@ class _ProfileCard extends ConsumerWidget {
     final success = await ref
         .read(childProfilesControllerProvider.notifier)
         .archive(profile.id);
-    if (!context.mounted || success) return;
-    _showMutationError(
-        context, ref.read(childProfilesControllerProvider).error);
+    if (!context.mounted) return;
+    if (!success) {
+      _showMutationError(
+          context, ref.read(childProfilesControllerProvider).error);
+      return;
+    }
+    if (ref.read(activeChildIdProvider) == profile.id) {
+      final remainingProfiles =
+          ref.read(childProfilesControllerProvider).valueOrNull ??
+              const <ChildProfile>[];
+      ref.read(activeChildIdProvider.notifier).state =
+          remainingProfiles.isEmpty ? null : remainingProfiles.first.id;
+    }
   }
 }
 

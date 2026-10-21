@@ -106,6 +106,54 @@ void main() {
     expect(find.text('أدخل اسم الطفل'), findsOneWidget);
   });
 
+  testWidgets('archiving the active child selects a remaining profile',
+      (tester) async {
+    final repository = _FakeChildrenRepository(const [
+      ChildProfile(id: '1', name: 'ليان'),
+      ChildProfile(id: '2', name: 'عمر'),
+    ]);
+    await tester.pumpWidget(_testApp(repository));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('select-active-child-2')));
+    await tester.pumpAndSettle();
+    expect(find.text('الطفل النشط'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('إجراءات عمر'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('أرشفة'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('أرشفة'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('عمر'), findsNothing);
+    expect(find.text('ليان'), findsOneWidget);
+    expect(find.text('الطفل النشط'), findsOneWidget);
+    expect(find.byKey(const Key('select-active-child-1')), findsNothing);
+  });
+
+  testWidgets('archiving the only active child clears active selection',
+      (tester) async {
+    final repository = _FakeChildrenRepository(const [
+      ChildProfile(id: '1', name: 'ليان'),
+    ]);
+    await tester.pumpWidget(_testApp(repository));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('select-active-child-1')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('إجراءات ليان'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('أرشفة'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('أرشفة'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('ليان'), findsNothing);
+    expect(find.text('لا توجد ملفات أطفال بعد.'), findsOneWidget);
+    expect(find.text('الطفل النشط'), findsNothing);
+  });
+
   testWidgets('selects an active child and identifies it accessibly',
       (tester) async {
     final repository = _FakeChildrenRepository(const [
