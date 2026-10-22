@@ -232,6 +232,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
 
   void _startSession(String childId) {
     final startedAt = ref.read(studySessionClockProvider)().toUtc();
+    ref.read(activeChildIdProvider.notifier).state = childId;
     setState(() {
       _selectedChildId = childId;
       _runningChildId = childId;

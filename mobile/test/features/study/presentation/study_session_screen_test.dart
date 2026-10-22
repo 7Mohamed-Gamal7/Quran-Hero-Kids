@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:quran_hero_kids/src/features/children/data/children_providers.dart';
 import 'package:quran_hero_kids/src/features/children/domain/child_profile.dart';
 import 'package:quran_hero_kids/src/features/children/presentation/children_controller.dart';
 import 'package:quran_hero_kids/src/features/study/data/study_sessions_providers.dart';
@@ -63,8 +64,20 @@ Widget _app(
         studySessionsRepositoryProvider.overrideWithValue(repository),
         studySessionClockProvider.overrideWithValue(clock),
       ],
-      child: const MaterialApp(
-        home: Scaffold(body: StudySessionScreen()),
+      child: MaterialApp(
+        home: Scaffold(
+          body: Column(
+            children: [
+              Expanded(child: StudySessionScreen()),
+              Consumer(
+                builder: (context, ref, child) => Text(
+                  ref.watch(activeChildIdProvider) ?? 'none',
+                  key: const Key('active-child-state-probe'),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
 
@@ -97,9 +110,11 @@ void main() {
     expect(find.text('ملف الطفل'), findsOneWidget);
     expect(find.text('بدء الجلسة'), findsOneWidget);
     expect(find.textContaining('لا يتضمن التطبيق حتى الآن'), findsOneWidget);
+    expect(find.text('none'), findsOneWidget);
 
     await tester.tap(find.text('بدء الجلسة'));
     await tester.pump();
+    expect(find.text('123e4567-e89b-42d3-a456-426614174002'), findsOneWidget);
     now = now.add(const Duration(seconds: 3));
     await tester.pump(const Duration(seconds: 3));
 
