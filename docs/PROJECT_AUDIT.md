@@ -62,6 +62,12 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - Baseline passed: 38 .NET tests, 17 Flutter tests, Flutter analyze and Dart format; final verification after the change passed 38 .NET tests and 19 Flutter tests, analyzer/format, .NET whitespace verification, and NuGet vulnerability scan (no vulnerable packages reported by configured sources).
 - A regression test first reproduced an inconsistent family UI after archiving the selected child: the active marker disappeared while the in-memory ID still referenced an archived profile. On successful archive, selection now moves to the first remaining profile or clears when none remain. Tests cover both cases. Selection remains memory-only and is not account-scoped pending parent authentication.
 
+## Follow-up verification on 2026-10-22
+
+- Repository was synchronized before work: `master` matched `origin/master` at `e67407c`, and the worktree was clean. Full structural/documentation/test/dependency review found Firebase setup/install permission, Quran source approval, CI workflow permission, and Android SDK/build verification still gated or unavailable; no gates were bypassed.
+- Baseline passed: .NET **38/38**, Flutter **19/19**, Flutter analyzer/formatter, .NET whitespace verification, and NuGet vulnerability scan (none reported by configured sources). Final Flutter suite after the UI-state change passed **19/19**, analyzer had no issues, and Dart format found no changes in 23 files.
+- A red widget assertion reproduced that the first profile displayed by learning when no explicit selection exists was not reflected in shared family state after starting a session. Session start now records the actual child ID to shared in-memory selection; it adds no persistence or child data. Existing active-child state remains non-durable and not UID-scoped.
+
 ## Priority findings
 
 1. **P0 — Flutter parent Firebase auth is absent.** Preserve fail-closed behavior. Add Firebase only after the active install permission gate allows it and real generated options are provided/configured.
