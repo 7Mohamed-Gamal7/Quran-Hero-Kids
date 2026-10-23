@@ -68,6 +68,13 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - Baseline passed: .NET **38/38**, Flutter **19/19**, Flutter analyzer/formatter, .NET whitespace verification, and NuGet vulnerability scan (none reported by configured sources). Final Flutter suite after the UI-state change passed **19/19**, analyzer had no issues, and Dart format found no changes in 23 files.
 - A red widget assertion reproduced that the first profile displayed by learning when no explicit selection exists was not reflected in shared family state after starting a session. Session start now records the actual child ID to shared in-memory selection; it adds no persistence or child data. Existing active-child state remains non-durable and not UID-scoped.
 
+## Follow-up verification on 2026-10-23
+
+- Repository synchronized cleanly at `6bf5d2f`; structural review covered backend/mobile source layout, tests, dependencies, current plan and product/security/content/data/operations documentation.
+- Baseline passed: .NET **38/38**, Flutter **19/19**, analyzer and format, .NET whitespace check, and NuGet vulnerability scan (none reported against configured sources).
+- Added a widget test for the study-session screen at **320×640** with **200% text scaling**. Target screen tests passed **4/4**; the full Flutter suite passed **20/20**, analyzer reported no issues, and formatter found no changes in 23 Dart files. This is targeted widget coverage, not full accessibility certification or physical-device validation.
+- Firebase remains blocked on real owner configuration and the package permission gate; Quran source/audio remain subject to explicit owner selection and terms approval; no `.github/workflows/` exist; Android release build/merged-manifest verification was not attempted in this session. No external content was downloaded or called and no credentials/resources were created.
+
 ## Priority findings
 
 1. **P0 — Flutter parent Firebase auth is absent.** Preserve fail-closed behavior. Add Firebase only after the active install permission gate allows it and real generated options are provided/configured.
