@@ -82,6 +82,24 @@ Widget _app(
     );
 
 void main() {
+  testWidgets('study session fits a narrow screen with enlarged text',
+      (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.platformDispatcher.clearTextScaleFactorTestValue();
+    });
+
+    await tester.pumpWidget(_app(_FakeStudySessionsRepository(), DateTime.now));
+    await tester.pumpAndSettle();
+
+    expect(find.text('جلسة تعلّم'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('changing the active child loads that child session history',
       (tester) async {
     final repository = _FakeStudySessionsRepository();
