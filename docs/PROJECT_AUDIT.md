@@ -75,6 +75,13 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - Added a widget test for the study-session screen at **320×640** with **200% text scaling**. Target screen tests passed **4/4**; the full Flutter suite passed **20/20**, analyzer reported no issues, and formatter found no changes in 23 Dart files. This is targeted widget coverage, not full accessibility certification or physical-device validation.
 - Firebase remains blocked on real owner configuration and the package permission gate; Quran source/audio remain subject to explicit owner selection and terms approval; no `.github/workflows/` exist; Android release build/merged-manifest verification was not attempted in this session. No external content was downloaded or called and no credentials/resources were created.
 
+## Follow-up verification on 2026-10-24
+
+- Repository synchronized cleanly at `dd7ec41`. Structural review covered tracked source, tests, dependencies, workflows, project plan, and product, architecture, security, data, content, and operations documents.
+- Added a semantics widget test for the bottom navigation. It verifies the Arabic labels for Home and Learning, button role, tap action, and selected state for the active destination against the Flutter SDK semantics tree. Full Flutter tests passed **21/21**; analyzer reported no issues; formatter found no changes in 23 Dart files.
+- .NET tests passed **38/38**, whitespace formatting passed, and the NuGet scan reported no vulnerable packages from configured sources. These local checks do not constitute accessibility certification or a live-service security review.
+- Read-only GitHub API reported repository `admin` and `push` permissions, but did not establish workflow-specific token permission. Because creating workflow files was previously denied, no workflow write was attempted. Firebase config/install permission and Quran text/audio approval remain gates; no credentials, content, or cloud resources were created.
+
 ## Priority findings
 
 1. **P0 — Flutter parent Firebase auth is absent.** Preserve fail-closed behavior. Add Firebase only after the active install permission gate allows it and real generated options are provided/configured.
