@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -58,6 +60,31 @@ void main() {
     expect(find.text('اختياري'), findsOneWidget);
     expect(find.text('حفظ'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('navigation destinations expose accessible button semantics',
+      (tester) async {
+    final semanticsHandle = tester.ensureSemantics();
+    try {
+      await tester.pumpWidget(const ProviderScope(child: QuranHeroApp()));
+
+      final home = tester
+          .getSemantics(find.bySemanticsLabel('الرئيسية'))
+          .getSemanticsData();
+      expect(home.label, 'الرئيسية');
+      expect(home.flagsCollection.isButton, isTrue);
+      expect(home.flagsCollection.isSelected, ui.Tristate.isTrue);
+      expect(home.hasAction(ui.SemanticsAction.tap), isTrue);
+
+      final learn = tester
+          .getSemantics(find.bySemanticsLabel('التعلّم'))
+          .getSemanticsData();
+      expect(learn.label, 'التعلّم');
+      expect(learn.flagsCollection.isButton, isTrue);
+      expect(learn.hasAction(ui.SemanticsAction.tap), isTrue);
+    } finally {
+      semanticsHandle.dispose();
+    }
   });
 
   testWidgets('renders Arabic home dashboard and accessible navigation',
