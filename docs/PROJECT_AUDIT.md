@@ -81,6 +81,14 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - Added a semantics widget test for the bottom navigation. It verifies the Arabic labels for Home and Learning, button role, tap action, and selected state for the active destination against the Flutter SDK semantics tree. Full Flutter tests passed **21/21**; analyzer reported no issues; formatter found no changes in 23 Dart files.
 - .NET tests passed **38/38**, whitespace formatting passed, and the NuGet scan reported no vulnerable packages from configured sources. These local checks do not constitute accessibility certification or a live-service security review.
 - Read-only GitHub API reported repository `admin` and `push` permissions, but did not establish workflow-specific token permission. Because creating workflow files was previously denied, no workflow write was attempted. Firebase config/install permission and Quran text/audio approval remain gates; no credentials, content, or cloud resources were created.
+- The same read-only GitHub response reported the repository visibility as **public**. No visibility change was made; owner direction is still needed on whether that is intentional. This check did not establish that secrets or sensitive data were exposed.
+
+## Follow-up verification on 2026-10-25
+
+- Repository synchronized cleanly at `7b3763a`; structural, task-ledger, documentation, and dependency review confirmed Firebase setup/install, Quran content approval, CI workflow permission, and repository-visibility direction remain outstanding.
+- A new semantics test reproduced duplicate spoken/textual duration: the node exposed both its explicit `المدة 00:00` label and the descendant's `00:00` text. The timer's explicit live-region semantics now exclude descendant semantics, leaving one accessible label; test coverage confirms it updates from `00:00` to `00:03` while the session runs. Study-session tests passed **5/5**; full Flutter suite passed **22/22**, analyzer had no issues, and formatter found no changes across 23 Dart files.
+- .NET tests passed **38/38**, whitespace format verification passed, and NuGet scan reported no vulnerable packages from configured sources. `git diff --check` and local documentation-link verification passed before final documentation commit. No backend, API, database, Quran content, credentials, or cloud resources changed.
+- GitHub read-only check again reported the repository as **public** and account permission as admin/push; workflow-specific write permission was not established. No visibility or workflow settings were changed.
 
 ## Priority findings
 

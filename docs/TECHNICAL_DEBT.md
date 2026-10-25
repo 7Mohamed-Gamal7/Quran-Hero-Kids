@@ -1,6 +1,6 @@
 # Technical Debt and Blockers
 
-**As of:** 2026-10-24 · Priorities are relative to a controlled beta and do not imply release approval.
+**As of:** 2026-10-25 · Priorities are relative to a controlled beta and do not imply release approval.
 
 | Priority | Finding | Impact | Evidence / prerequisite |
 |---|---|---|---|
@@ -12,8 +12,9 @@
 | P1 | Quran content is not approved or integrated | Learning screens cannot offer real surah/ayah/audio content. | `docs/product/content-sources.md`; owner approval and rights review are mandatory. |
 | P1 | Delete/export/retention is not executable | Families lack a verified lifecycle path for child/account data. | `docs/architecture/security.md`, `docs/architecture/data-model.md`; requires policy, market/legal review, and implementation. |
 | P1 | Release manifest networking needed explicit declaration | Release API/Firebase traffic may be unavailable without INTERNET in the merged app manifest. | `mobile/android/app/src/main/AndroidManifest.xml` now declares INTERNET; next Android release build must verify merge. |
+| P1 | Repository visibility needs owner confirmation | GitHub reports this repository as public; do not change visibility without explicit owner direction. Public visibility alone is not evidence that secrets or child data were exposed. | Read-only repository API check on 2026-10-25; no change was made. |
 | P2 | Home progress and child name are prototype values | UI can imply account-specific progress where none is persisted or derived. | `mobile/lib/src/screens.dart`; replace when backed metrics and account data are available. |
 | P2 | No CI workflow is present | Formatting, tests, dependency checks, and builds are not automatically gated. | No `.github/workflows/`; confirm workflow permissions/configuration before adding workflows. |
 | P2 | Flutter lockfile drift from local SDK | Modified lockfile downgraded transitive versions and changed committed Dart >=3.11 floor to local resolution >=3.8. | `mobile/pubspec.lock`; preserve until deliberate resolution with compatible SDK and authorized Firebase dependencies. |
 | P2 | Backend auth tests do not verify Firebase signatures | Tests prove authorization/ownership with synthetic test identity, not Firebase signature/issuer verification. | `backend/tests/QuranHero.Api.Tests/Infrastructure/IntegrationTestFactory.cs`; live verification is an external gate. |
-| P2 | Accessibility and release-device breadth not established | Narrow-screen/200% widget tests cover home, child-profile dialog, and study-session screen; a semantics test checks two navigation destinations' labels/actions/selection (2026-10-24). Broader screen-reader, scaling, contrast, platform, and device checks remain. | `mobile/test/widget_test.dart`, `mobile/test/features/study/presentation/study_session_screen_test.dart`; targeted local widget tests are not device or full accessibility certification. |
+| P2 | Accessibility and release-device breadth not established | Narrow-screen/200% widget tests cover home, child-profile dialog, and study-session screen; semantics tests cover navigation labels/actions/selection and a single timer live-region label (2026-10-25). Broader screen-reader, scaling, contrast, platform, and device checks remain. | `mobile/test/widget_test.dart`, `mobile/test/features/study/presentation/study_session_screen_test.dart`; targeted local widget tests are not device or full accessibility certification. |

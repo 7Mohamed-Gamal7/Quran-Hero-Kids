@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-**Status date:** 2026-10-24. This is the forward-looking backlog; `docs/TASKS.md` remains the execution history and daily verification ledger.
+**Status date:** 2026-10-25. This is the forward-looking backlog; `docs/TASKS.md` remains the execution history and daily verification ledger.
 
 ## Phase 0 — Baseline and safe release foundations
 
