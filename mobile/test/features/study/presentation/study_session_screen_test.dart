@@ -84,10 +84,10 @@ Widget _app(
 void main() {
   testWidgets('elapsed time is exposed as an accessible live region',
       (tester) async {
+    var now = DateTime.utc(2026, 10, 25, 5);
     final semanticsHandle = tester.ensureSemantics();
     try {
-      await tester
-          .pumpWidget(_app(_FakeStudySessionsRepository(), DateTime.now));
+      await tester.pumpWidget(_app(_FakeStudySessionsRepository(), () => now));
       await tester.pumpAndSettle();
 
       final elapsed = tester
@@ -95,6 +95,17 @@ void main() {
           .getSemanticsData();
       expect(elapsed.label, 'المدة 00:00');
       expect(elapsed.flagsCollection.isLiveRegion, isTrue);
+
+      await tester.tap(find.text('بدء الجلسة'));
+      await tester.pump();
+      now = now.add(const Duration(seconds: 3));
+      await tester.pump(const Duration(seconds: 3));
+
+      final updatedElapsed = tester
+          .getSemantics(find.byKey(const Key('study-session-elapsed')))
+          .getSemanticsData();
+      expect(updatedElapsed.label, 'المدة 00:03');
+      expect(updatedElapsed.flagsCollection.isLiveRegion, isTrue);
     } finally {
       semanticsHandle.dispose();
     }
