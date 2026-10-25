@@ -82,6 +82,24 @@ Widget _app(
     );
 
 void main() {
+  testWidgets('elapsed time is exposed as an accessible live region',
+      (tester) async {
+    final semanticsHandle = tester.ensureSemantics();
+    try {
+      await tester
+          .pumpWidget(_app(_FakeStudySessionsRepository(), DateTime.now));
+      await tester.pumpAndSettle();
+
+      final elapsed = tester
+          .getSemantics(find.byKey(const Key('study-session-elapsed')))
+          .getSemanticsData();
+      expect(elapsed.label, 'المدة 00:00');
+      expect(elapsed.flagsCollection.isLiveRegion, isTrue);
+    } finally {
+      semanticsHandle.dispose();
+    }
+  });
+
   testWidgets('study session fits a narrow screen with enlarged text',
       (tester) async {
     tester.view.physicalSize = const Size(320, 640);

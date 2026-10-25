@@ -122,6 +122,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
                         Semantics(
                           liveRegion: true,
                           label: 'المدة ${_formatDuration(_elapsed)}',
+                          excludeSemantics: true,
                           child: Text(
                             _formatDuration(_elapsed),
                             key: const Key('study-session-elapsed'),
