@@ -322,20 +322,28 @@ class _ChildProfileDialogState extends State<_ChildProfileDialog> {
                 },
               ),
               const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
-                isExpanded: true,
-                initialValue: _ageBand,
-                decoration: const InputDecoration(
-                  labelText: 'الفئة العمرية',
-                  helperText: 'اختياري',
+              MergeSemantics(
+                child: Semantics(
+                  hint: 'اختياري',
+                  child: DropdownButtonFormField<String>(
+                    isExpanded: true,
+                    initialValue: _ageBand,
+                    decoration: const InputDecoration(
+                      labelText: 'الفئة العمرية',
+                      helperText: 'اختياري',
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: '5-7', child: Text('5–7 سنوات')),
+                      DropdownMenuItem(
+                          value: '8-10', child: Text('8–10 سنوات')),
+                      DropdownMenuItem(
+                          value: '11-13', child: Text('11–13 سنة')),
+                      DropdownMenuItem(
+                          value: '14+', child: Text('14 سنة فأكثر')),
+                    ],
+                    onChanged: (value) => setState(() => _ageBand = value),
+                  ),
                 ),
-                items: const [
-                  DropdownMenuItem(value: '5-7', child: Text('5–7 سنوات')),
-                  DropdownMenuItem(value: '8-10', child: Text('8–10 سنوات')),
-                  DropdownMenuItem(value: '11-13', child: Text('11–13 سنة')),
-                  DropdownMenuItem(value: '14+', child: Text('14 سنة فأكثر')),
-                ],
-                onChanged: (value) => setState(() => _ageBand = value),
               ),
             ],
           ),

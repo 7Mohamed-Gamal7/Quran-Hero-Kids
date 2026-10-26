@@ -88,6 +88,30 @@ void main() {
     expect(find.text('إعادة المحاولة'), findsOneWidget);
   });
 
+  testWidgets('child profile form exposes labeled inputs to screen readers',
+      (tester) async {
+    final semanticsHandle = tester.ensureSemantics();
+    try {
+      await tester.pumpWidget(_testApp(_FakeChildrenRepository([])));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('إضافة ملف طفل'));
+      await tester.pumpAndSettle();
+
+      final nameField =
+          tester.getSemantics(find.byType(TextFormField)).getSemanticsData();
+      expect(nameField.label, contains('اسم الطفل'));
+
+      final ageBandField = tester
+          .getSemantics(find.byType(DropdownButtonFormField<String>))
+          .getSemanticsData();
+      expect(ageBandField.label, contains('الفئة العمرية'));
+      expect(ageBandField.hint, contains('اختياري'));
+      expect(ageBandField.flagsCollection.isButton, isTrue);
+    } finally {
+      semanticsHandle.dispose();
+    }
+  });
+
   testWidgets('renders child profiles and validates the add form',
       (tester) async {
     final repository = _FakeChildrenRepository([
