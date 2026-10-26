@@ -1,6 +1,6 @@
 # Existing Features and Current Status
 
-**As of:** 2026-10-22
+**As of:** 2026-10-26
 
 Statuses describe implementation in this checkout—not planned architecture or release readiness.
 
@@ -19,5 +19,6 @@ Statuses describe implementation in this checkout—not planned architecture or 
 | Tests and achievements | **Placeholder** | Screens state activities are not enabled without approved content and persisted progress. |
 | Production migrations | **Separate procedure implemented** | API does not auto-apply production migrations; reviewed SQL is a separate operations step. No production database was accessed. |
 | Android Internet permission | **Source manifest fixed in audit slice** | Main manifest previously omitted `INTERNET`; debug/profile manifests included it. Release merged-manifest/build verification remains pending. |
+| Accessibility | **Partial, widget-tested** | Narrow-screen/text scaling fixes and semantics for navigation, study timer, and child-profile labels are covered by targeted widget tests; full screen-reader/platform/device, contrast, and release verification remain open. |
 | Continuous integration | **Absent in checkout** | `.github/workflows/` does not exist; `.github` has a pull request template. |
 | Privacy deletion/export | **Policy/design only** | Security docs call for deletion/export and retention; no end-to-end implementation is evidenced. |

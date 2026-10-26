@@ -90,6 +90,13 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - .NET tests passed **38/38**, whitespace format verification passed, and NuGet scan reported no vulnerable packages from configured sources. `git diff --check` and local documentation-link verification passed before final documentation commit. No backend, API, database, Quran content, credentials, or cloud resources changed.
 - GitHub read-only check again reported the repository as **public** and account permission as admin/push; workflow-specific write permission was not established. No visibility or workflow settings were changed.
 
+## Follow-up verification on 2026-10-26
+
+- Repository synchronized cleanly at `76ea711`. Structural review covered the tracked backend/mobile/docs layout, .NET and Flutter projects/tests, and workflow state (no `.github/workflows/` directory); product, architecture, security, data, content, operations, and task-ledger docs were reviewed.
+- A widget semantics test found that the child age-band field showed the visual helper `اختياري`, but Flutter's semantics label did not expose that optionality. The dropdown now publishes `اختياري` as a semantic hint, merged with the field's dropdown semantics. The test verifies the child-name label, age-band label, optional hint, and button role. Target child-profile suite passed **7/7**; full Flutter suite passed **23/23**, analyzer reported no issues, and formatter found no changes across 23 files.
+- .NET baseline passed **38/38**, whitespace format verification passed, and NuGet scan reported no vulnerable packages from configured sources. No child data fields, API, database, dependencies, Quran content, or cloud resources changed.
+- Read-only GitHub API again reported `visibility: public` and `admin`/`push` repository permission. Workflow-specific token permission remains unestablished; no visibility or workflow settings were modified.
+
 ## Priority findings
 
 1. **P0 — Flutter parent Firebase auth is absent.** Preserve fail-closed behavior. Add Firebase only after the active install permission gate allows it and real generated options are provided/configured.
