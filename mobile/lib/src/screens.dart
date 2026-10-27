@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
+import 'features/children/data/children_providers.dart';
 import 'features/children/presentation/child_profiles_screen.dart';
+import 'features/study/data/study_sessions_providers.dart';
 import 'features/study/presentation/study_session_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -36,19 +38,7 @@ class HomeScreen extends ConsumerWidget {
                   child: Icon(Icons.auto_awesome, color: colors.primary)),
             ]),
             const SizedBox(height: 24),
-            _DailyGoalCard(),
-            const SizedBox(height: 14),
-            Row(children: const [
-              Expanded(
-                  child: _MetricCard(
-                      icon: Icons.local_fire_department,
-                      label: 'أيام متتابعة',
-                      value: '٠')),
-              SizedBox(width: 12),
-              Expanded(
-                  child: _MetricCard(
-                      icon: Icons.stars_rounded, label: 'نقاطي', value: '٠')),
-            ]),
+            _HomeProgressCard(childId: ref.watch(activeChildIdProvider)),
             const SizedBox(height: 25),
             Text('رحلتك اليوم', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 12),
@@ -80,7 +70,7 @@ class HomeScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             const Text(
-                'الأرقام هنا تبدأ من الصفر في النسخة الأولية؛ ستُربط ببيانات الحساب والجلسات في الخطوة التالية.',
+                'يعرض الملخص آخر 30 جلسة محفوظة فقط؛ الأهداف والنقاط والسلاسل لم تُربط بعد.',
                 style: TextStyle(color: Colors.black54, fontSize: 12)),
           ]),
         ),
@@ -115,52 +105,140 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-class _DailyGoalCard extends StatelessWidget {
-  const _DailyGoalCard();
+class _HomeProgressCard extends ConsumerWidget {
+  const _HomeProgressCard({required this.childId});
+
+  final String? childId;
 
   @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Card(
-      color: colors.primary,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            const Icon(Icons.wb_sunny_outlined, color: Colors.white),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'هدف اليوم',
-                style: TextStyle(color: Colors.white.withValues(alpha: .9)),
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (childId == null) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('ملخص التعلّم',
+                  style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 8),
+              const Text('اختر ملف طفل من تبويب الأسرة لعرض جلساته المحفوظة.'),
+              const SizedBox(height: 8),
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: TextButton(
+                  onPressed: () => ref
+                      .read(selectedTabProvider.notifier)
+                      .state = AppTab.family,
+                  child: const Text('اختيار ملف الطفل'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final sessionsProvider = studySessionsForChildProvider(childId!);
+    return ref.watch(sessionsProvider).when(
+          loading: () => const Card(
+            child: ListTile(
+              leading: SizedBox.square(
+                dimension: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              title: Text('جار تحميل ملخص التعلّم'),
+            ),
+          ),
+          error: (error, stackTrace) => Card(
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('ملخص التعلّم',
+                      style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 8),
+                  const Text(
+                      'تعذر تحميل الجلسات المحفوظة. تحقق من الاتصال ثم أعد المحاولة.'),
+                  Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: TextButton(
+                      onPressed: () => ref.invalidate(sessionsProvider),
+                      child: const Text('إعادة المحاولة'),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ]),
-          const SizedBox(height: 13),
-          const Text('خطوة صغيرة كل يوم',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 21,
-                  fontWeight: FontWeight.w800)),
-          const SizedBox(height: 5),
-          Text('ابدأ جلسة التعلّم الأولى وحدّد هدفًا يناسبك.',
-              style: TextStyle(color: Colors.white.withValues(alpha: .88))),
-          const SizedBox(height: 17),
-          ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: const LinearProgressIndicator(
-                  value: 0,
-                  minHeight: 8,
-                  backgroundColor: Color(0x557FFFFFFF),
-                  color: Color(0xFFFFD166))),
-          const SizedBox(height: 8),
-          const Text('٠٪ مكتمل',
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-        ]),
-      ),
-    );
+          ),
+          data: (sessions) {
+            final totalDurationSeconds = sessions.fold<int>(
+              0,
+              (total, session) => total + session.durationSeconds,
+            );
+            return Column(
+              children: [
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: Row(
+                      children: [
+                        Icon(Icons.insights,
+                            color: Theme.of(context).colorScheme.primary),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'الجلسات المحفوظة (آخر 30 كحد أقصى)',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _MetricCard(
+                        icon: Icons.menu_book_outlined,
+                        label: 'جلسة مسجلة',
+                        value: _arabicDigits(sessions.length),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _MetricCard(
+                        icon: Icons.timer_outlined,
+                        label: 'وقت التعلّم',
+                        value: _formatStudyDuration(totalDurationSeconds),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        );
   }
+}
+
+String _arabicDigits(int value) => value.toString().replaceAllMapped(
+      RegExp(r'\d'),
+      (match) => String.fromCharCode(0x0660 + int.parse(match.group(0)!)),
+    );
+
+String _formatStudyDuration(int totalSeconds) {
+  final totalMinutes = totalSeconds ~/ 60;
+  final hours = totalMinutes ~/ 60;
+  final minutes = totalMinutes % 60;
+  final seconds = totalSeconds % 60;
+  final parts = <String>[];
+  if (hours > 0) parts.add('${_arabicDigits(hours)} س');
+  if (minutes > 0) parts.add('${_arabicDigits(minutes)} د');
+  if (seconds > 0 || parts.isEmpty) parts.add('${_arabicDigits(seconds)} ث');
+  return parts.join(' ');
 }
 
 class _MetricCard extends StatelessWidget {

@@ -6,6 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_hero_kids/src/app.dart';
 import 'package:quran_hero_kids/src/features/children/data/children_providers.dart';
 import 'package:quran_hero_kids/src/features/children/domain/child_profile.dart';
+import 'package:quran_hero_kids/src/features/study/data/study_sessions_providers.dart';
+import 'package:quran_hero_kids/src/features/study/data/study_sessions_repository.dart';
+import 'package:quran_hero_kids/src/features/study/domain/study_session.dart';
 
 void main() {
   testWidgets('home and navigation fit a narrow screen with enlarged text',
@@ -22,7 +25,7 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: QuranHeroApp()));
     await tester.pumpAndSettle();
 
-    expect(find.text('هدف اليوم'), findsOneWidget);
+    expect(find.text('ملخص التعلّم'), findsOneWidget);
     expect(find.text('التعلّم'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -92,7 +95,11 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: QuranHeroApp()));
 
     expect(find.text('مرحبًا ببطل القرآن'), findsOneWidget);
-    expect(find.text('هدف اليوم'), findsOneWidget);
+    expect(find.text('ملخص التعلّم'), findsOneWidget);
+    expect(
+      find.text('اختر ملف طفل من تبويب الأسرة لعرض جلساته المحفوظة.'),
+      findsOneWidget,
+    );
     expect(find.text('التعلّم'), findsOneWidget);
     expect(find.text('الأسرة'), findsOneWidget);
     expect(find.text('جلسة تعلّم'), findsOneWidget);
@@ -108,7 +115,52 @@ void main() {
     expect(find.text('لوحة الأسرة'), findsOneWidget);
     expect(find.text('أضف ملف طفل لمتابعة أهدافه وتقدمه.'), findsOneWidget);
   });
+
+  testWidgets('home summary uses saved sessions for the active child',
+      (tester) async {
+    final sessionsRepository = _FakeStudySessionsRepository([
+      _session('session-1', StudySessionKind.memorization, 125),
+      _session('session-2', StudySessionKind.revision, 35),
+    ]);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          childProfilesRepositoryProvider
+              .overrideWithValue(_SingleChildProfilesRepository()),
+          studySessionsRepositoryProvider.overrideWithValue(sessionsRepository),
+        ],
+        child: const QuranHeroApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('الأسرة'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('select-active-child-child-1')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('الرئيسية'));
+    await tester.pumpAndSettle();
+
+    expect(sessionsRepository.listedChildIds, ['child-1']);
+    expect(find.text('٢'), findsOneWidget);
+    expect(find.text('٢ د ٤٠ ث'), findsOneWidget);
+    expect(find.text('الجلسات المحفوظة (آخر 30 كحد أقصى)'), findsOneWidget);
+  });
 }
+
+StudySessionRecord _session(
+  String id,
+  StudySessionKind kind,
+  int durationSeconds,
+) =>
+    StudySessionRecord(
+      id: id,
+      clientEventId: 'event-$id',
+      kind: kind,
+      durationSeconds: durationSeconds,
+      occurredAt: DateTime.utc(2026, 10, 26, 8),
+      receivedAt: DateTime.utc(2026, 10, 26, 8),
+    );
 
 class _EmptyChildProfilesRepository implements ChildProfilesRepository {
   @override
@@ -130,4 +182,44 @@ class _EmptyChildProfilesRepository implements ChildProfilesRepository {
 
   @override
   Future<void> archive(String id) async {}
+}
+
+class _SingleChildProfilesRepository implements ChildProfilesRepository {
+  static const child = ChildProfile(id: 'child-1', name: 'ليان');
+
+  @override
+  Future<List<ChildProfile>> list() async => const [child];
+
+  @override
+  Future<ChildProfile> create(ChildProfileDraft draft) async => child;
+
+  @override
+  Future<ChildProfile> getById(String id) async => child;
+
+  @override
+  Future<ChildProfile> update(String id, ChildProfileDraft draft) async =>
+      child;
+
+  @override
+  Future<void> archive(String id) async {}
+}
+
+class _FakeStudySessionsRepository implements StudySessionsRepository {
+  _FakeStudySessionsRepository(this.sessions);
+
+  final List<StudySessionRecord> sessions;
+  final listedChildIds = <String>[];
+
+  @override
+  Future<List<StudySessionRecord>> list(String childId) async {
+    listedChildIds.add(childId);
+    return sessions;
+  }
+
+  @override
+  Future<StudySessionRecord> record(
+    String childId,
+    StudySessionDraft draft,
+  ) async =>
+      throw UnimplementedError();
 }
