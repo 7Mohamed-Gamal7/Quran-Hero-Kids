@@ -97,6 +97,13 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - .NET baseline passed **38/38**, whitespace format verification passed, and NuGet scan reported no vulnerable packages from configured sources. No child data fields, API, database, dependencies, Quran content, or cloud resources changed.
 - Read-only GitHub API again reported `visibility: public` and `admin`/`push` repository permission. Workflow-specific token permission remains unestablished; no visibility or workflow settings were modified.
 
+## Follow-up verification on 2026-10-27
+
+- Repository began clean and synchronized on `master` at `b6de83e`; source structure, task ledger, current plan, product/security/data/content/operations docs, tests, and dependencies were reviewed. No `.github/workflows/` directory exists.
+- The home dashboard no longer presents hard-coded daily-goal, streak, or point zeros. For a selected active child, it derives saved-session count and total duration from the existing session-history provider; it clearly caps the summary at the API's default latest 30 records. No-selection, loading, and error/retry states are explicit. Goals, streaks, points, and the greeting name remain unbacked; P2.2 is partial, not complete.
+- A widget test selects a fake child and verifies the requested child ID, two saved sessions, and a derived duration of 2m40s; home tests also verify the no-selection state. Targeted home suite passed **5/5**; full Flutter suite passed **24/24**, analyzer had no issues, and formatter found no changes across 23 Dart files. .NET baseline passed **38/38**, whitespace format verification passed, and NuGet scan reported no vulnerable packages from configured sources; backend/API/database were unchanged. No live Firebase or API test was possible because real auth/configuration remains absent.
+- GitHub read-only API reported the repository **public** with admin/push permission; no visibility or workflow setting was changed. No credentials, Quran text/audio, dependencies, or cloud resources were added.
+
 ## Priority findings
 
 1. **P0 — Flutter parent Firebase auth is absent.** Preserve fail-closed behavior. Add Firebase only after the active install permission gate allows it and real generated options are provided/configured.
