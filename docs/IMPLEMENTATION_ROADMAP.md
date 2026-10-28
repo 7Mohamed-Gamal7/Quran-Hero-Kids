@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-**Status date:** 2026-10-27. This is the forward-looking backlog; `docs/TASKS.md` remains the execution history and daily verification ledger.
+**Status date:** 2026-10-28. This is the forward-looking backlog; `docs/TASKS.md` remains the execution history and daily verification ledger.
 
 ## Phase 0 — Baseline and safe release foundations
 
@@ -40,8 +40,8 @@
 
 ## Phase 4 — Progress and durable offline learning
 
-- **Partial (2026-10-27):** the home screen derives session count and duration from the selected child's latest 30 saved sessions. Daily goals, streaks, points, and account-backed greeting remain open; no live API/auth connection was tested.
-- Complete backend-derived progress metrics beyond the 30-session preview and define goal/streak rules before displaying them.
+- **Partial (2026-10-27/28):** the home screen still derives session count and duration from the selected child's latest 30 saved sessions. A protected `GET /api/v1/children/{childId}/study-sessions/summary` now aggregates all saved sessions; the Flutter screen has not been wired to it. Daily goals, streaks, points, and account-backed greeting remain open; no live API/auth connection was tested.
+- Connect the all-session summary endpoint to Flutter, then define goal/streak rules before displaying those metrics.
 - Add a durable, appropriately protected outbox for pending study events, stable idempotency keys, retry/backoff, and visible sync status.
 - Implement tests, goals, achievements, and rewards only when content/session rules are defined and server-authoritative where needed.
 

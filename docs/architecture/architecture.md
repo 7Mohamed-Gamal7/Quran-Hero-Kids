@@ -59,7 +59,7 @@ docs/
 - هوية المستخدم تأتي من token موثق؛ لا يقبل الخادم `parentId` كمرجع صلاحية من جسم الطلب.
 - قوائم النتائج محددة بصفحات، وأخطاء بصيغة RFC 9457 Problem Details.
 - `POST /api/v1/children/{childId}/study-sessions` يقبل `clientEventId` ثابتًا من العميل؛ إعادة المحاولة المطابقة تعيد السجل الحالي، وإعادة استخدام المعرف مع حمولة مختلفة تعيد `409`.
-- المسارات المنفذة: CRUD/أرشفة `/api/v1/children`، وتسجيل/قراءة `/api/v1/children/{childId}/study-sessions`، إضافة إلى `/health`.
+- المسارات المنفذة: CRUD/أرشفة `/api/v1/children`، وتسجيل/قراءة `/api/v1/children/{childId}/study-sessions`، وتجميع عدد ومدة جميع جلسات الطفل في `/api/v1/children/{childId}/study-sessions/summary` بعد التحقق من الملكية، إضافة إلى `/health`.
 - وثيقة OpenAPI v1 تصف نماذج الطلب والاستجابة والأخطاء وقيود الحقول؛ متطلبات Bearer مربوطة بالعمليات المحمية فقط. Swagger UI/JSON مفعلان في Development/Testing ولا يُكشفان في Production؛ `/health` عام.
 - مسارات الهوية والأهداف والمكافآت والتقارير والمحتوى القرآني ما زالت ضمن الخطة وليست منفذة بعد.
 

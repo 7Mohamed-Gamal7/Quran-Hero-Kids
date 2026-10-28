@@ -1,6 +1,6 @@
 # Existing Features and Current Status
 
-**As of:** 2026-10-27
+**As of:** 2026-10-28
 
 Statuses describe implementation in this checkout—not planned architecture or release readiness.
 
@@ -14,7 +14,7 @@ Statuses describe implementation in this checkout—not planned architecture or 
 | Active child selection | **Partial** | Shared in-memory selection is used by family and learning/session flows; archiving the selected child falls back to another active profile or clears the selection, and starting a session on the default profile records it as active. Not persisted or scoped to parent identity across restart. |
 | Study session capture/history | **Implemented, network-dependent** | Timer, session kind/duration, stable UUID event ID, history, and retry with the same payload are present. Retry drafts remain screen-memory-only. |
 | Offline delivery | **Absent** | No durable outbox, background sync, retry-backoff queue, or conflict UI. |
-| Dashboard progress | **Partial** | Home derives count and total duration from the selected child's latest 30 saved sessions, with explicit no-selection/loading/error states. Daily goals, streaks, points, and greeting name remain prototype/unavailable; no live API/auth test. |
+| Dashboard progress | **Partial** | Home derives count and duration from the selected child's latest 30 saved sessions, with explicit no-selection/loading/error states. A new owner-scoped API summary aggregates every saved session, but the mobile screen does not consume it yet. Goals, streaks, points, and greeting name remain prototype/unavailable; no live API/auth test. |
 | Quran text/audio | **Blocked / absent** | `docs/product/content-sources.md` records no owner approval. No source integration or bundled text/audio exists. |
 | Tests and achievements | **Placeholder** | Screens state activities are not enabled without approved content and persisted progress. |
 | Production migrations | **Separate procedure implemented** | API does not auto-apply production migrations; reviewed SQL is a separate operations step. No production database was accessed. |
