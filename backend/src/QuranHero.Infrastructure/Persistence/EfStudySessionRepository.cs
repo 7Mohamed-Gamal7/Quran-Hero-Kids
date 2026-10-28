@@ -23,4 +23,17 @@ public sealed class EfStudySessionRepository(QuranHeroDbContext db) : IStudySess
             .ThenByDescending(item => item.Id)
             .Take(limit)
             .ToListAsync(cancellationToken);
+
+    public async Task<StudySessionSummaryView> GetSummaryAsync(Guid childId, CancellationToken cancellationToken)
+    {
+        var summary = await db.StudySessions
+            .Where(item => item.ChildId == childId)
+            .GroupBy(_ => 1)
+            .Select(sessions => new StudySessionSummaryView(
+                sessions.Count(),
+                sessions.Sum(item => (long)item.DurationSeconds)))
+            .SingleOrDefaultAsync(cancellationToken);
+
+        return summary ?? new StudySessionSummaryView(0, 0);
+    }
 }

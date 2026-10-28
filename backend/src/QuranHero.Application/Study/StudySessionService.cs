@@ -43,6 +43,17 @@ public sealed class StudySessionService(
         return items.Select(ToView).ToArray();
     }
 
+    public async Task<StudySessionSummaryView?> GetSummaryAsync(
+        string ownerUid,
+        Guid childId,
+        CancellationToken cancellationToken)
+    {
+        if (await children.FindAsync(childId, ownerUid, includeArchived: false, cancellationToken) is null)
+            return null;
+
+        return await sessions.GetSummaryAsync(childId, cancellationToken);
+    }
+
     private static StudySessionView ToView(StudySession session) => new(
         session.Id,
         session.ClientEventId,

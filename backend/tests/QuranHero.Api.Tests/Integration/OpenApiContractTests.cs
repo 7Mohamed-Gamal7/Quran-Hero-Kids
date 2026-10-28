@@ -60,6 +60,14 @@ public sealed class OpenApiContractTests : IClassFixture<IntegrationTestFactory>
         AssertHasResponse(sessionsPost, "409");
         AssertResponseSchema(sessionsPost, "201", "StudySessionView");
 
+        var sessionSummary = paths.GetProperty(
+            "/api/v1/children/{childId}/study-sessions/summary").GetProperty("get");
+        AssertBearerRequired(sessionSummary);
+        AssertHasResponse(sessionSummary, "200");
+        AssertHasResponse(sessionSummary, "401");
+        AssertHasResponse(sessionSummary, "404");
+        AssertResponseSchema(sessionSummary, "200", "StudySessionSummaryView");
+
         var schemas = root.GetProperty("components").GetProperty("schemas");
         var childRequest = schemas.GetProperty("CreateChildRequest").GetProperty("properties");
         Assert.True(childRequest.TryGetProperty("name", out var nameSchema));

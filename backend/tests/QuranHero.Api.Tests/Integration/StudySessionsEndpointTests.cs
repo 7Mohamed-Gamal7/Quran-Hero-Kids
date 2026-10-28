@@ -175,6 +175,66 @@ public sealed class StudySessionsEndpointTests : IClassFixture<IntegrationTestFa
         }
     }
 
+    [Fact]
+    public async Task GetSessionSummary_AggregatesAllSessionsAndScopesToOwner()
+    {
+        var owner = $"parent-{Guid.NewGuid():N}";
+        var otherOwner = $"parent-{Guid.NewGuid():N}";
+        var childId = await CreateChildAsync(owner);
+        var path = $"/api/v1/children/{childId}/study-sessions";
+
+        for (var index = 1; index <= 31; index++)
+        {
+            using var create = NewRequest(HttpMethod.Post, path, owner);
+            create.Content = JsonContent.Create(new
+            {
+                clientEventId = Guid.NewGuid(),
+                kind = "revision",
+                durationSeconds = index,
+                occurredAt = DateTimeOffset.UtcNow.AddSeconds(-index)
+            });
+            using var created = await _client.SendAsync(create);
+            Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        }
+
+        using var list = await _client.SendAsync(NewRequest(HttpMethod.Get, path, owner));
+        Assert.Equal(HttpStatusCode.OK, list.StatusCode);
+        var sessions = await list.Content.ReadFromJsonAsync<IReadOnlyList<SessionResponse>>();
+        Assert.NotNull(sessions);
+        Assert.Equal(30, sessions.Count);
+
+        using var summaryResponse = await _client.SendAsync(
+            NewRequest(HttpMethod.Get, $"{path}/summary", owner));
+        Assert.Equal(HttpStatusCode.OK, summaryResponse.StatusCode);
+        var summary = await summaryResponse.Content.ReadFromJsonAsync<SessionSummaryResponse>();
+        Assert.NotNull(summary);
+        Assert.Equal(31, summary.SessionCount);
+        Assert.Equal(496L, summary.TotalDurationSeconds);
+
+        using var otherParent = await _client.SendAsync(
+            NewRequest(HttpMethod.Get, $"{path}/summary", otherOwner));
+        Assert.Equal(HttpStatusCode.NotFound, otherParent.StatusCode);
+
+        using var anonymous = await _client.GetAsync($"{path}/summary");
+        Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetSessionSummary_ReturnsZeroesForChildWithoutSessions()
+    {
+        var owner = $"parent-{Guid.NewGuid():N}";
+        var childId = await CreateChildAsync(owner);
+        var path = $"/api/v1/children/{childId}/study-sessions/summary";
+
+        using var response = await _client.SendAsync(NewRequest(HttpMethod.Get, path, owner));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var summary = await response.Content.ReadFromJsonAsync<SessionSummaryResponse>();
+        Assert.NotNull(summary);
+        Assert.Equal(0, summary.SessionCount);
+        Assert.Equal(0L, summary.TotalDurationSeconds);
+    }
+
     private async Task<Guid> CreateChildAsync(string owner)
     {
         using var request = NewRequest(HttpMethod.Post, "/api/v1/children", owner);
@@ -195,4 +255,5 @@ public sealed class StudySessionsEndpointTests : IClassFixture<IntegrationTestFa
 
     private sealed record ChildResponse(Guid Id, string Name, string? AgeBand, bool IsArchived, DateTime CreatedAt, DateTime UpdatedAt);
     private sealed record SessionResponse(Guid Id, Guid ClientEventId, string Kind, int DurationSeconds, DateTimeOffset OccurredAt, DateTimeOffset ReceivedAt);
+    private sealed record SessionSummaryResponse(int SessionCount, long TotalDurationSeconds);
 }

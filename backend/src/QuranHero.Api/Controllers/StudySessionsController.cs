@@ -29,6 +29,20 @@ public sealed class StudySessionsController(IStudySessionService service) : Cont
         return result is null ? NotFound() : Ok(result);
     }
 
+    [HttpGet("summary")]
+    [ProducesResponseType(typeof(StudySessionSummaryView), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<StudySessionSummaryView>> Summary(
+        Guid childId,
+        CancellationToken cancellationToken = default)
+    {
+        var ownerUid = GetOwnerUid();
+        if (ownerUid is null) return Unauthorized();
+        var result = await service.GetSummaryAsync(ownerUid, childId, cancellationToken);
+        return result is null ? NotFound() : Ok(result);
+    }
+
     [HttpPost]
     [ProducesResponseType(typeof(StudySessionView), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]

@@ -16,12 +16,15 @@ public sealed record StudySessionView(
     DateTimeOffset OccurredAt,
     DateTimeOffset ReceivedAt);
 
+public sealed record StudySessionSummaryView(int SessionCount, long TotalDurationSeconds);
+
 public sealed record RecordStudySessionResult(StudySessionView Session, bool WasDuplicate, bool IsConflict = false);
 
 public interface IStudySessionRepository
 {
     Task<StudySession?> FindByClientEventIdAsync(Guid childId, Guid clientEventId, CancellationToken cancellationToken);
     Task<IReadOnlyList<StudySession>> ListAsync(Guid childId, int limit, CancellationToken cancellationToken);
+    Task<StudySessionSummaryView> GetSummaryAsync(Guid childId, CancellationToken cancellationToken);
     Task AddAsync(StudySession session, CancellationToken cancellationToken);
     Task SaveChangesAsync(CancellationToken cancellationToken);
 }
@@ -30,4 +33,5 @@ public interface IStudySessionService
 {
     Task<RecordStudySessionResult?> RecordAsync(string ownerUid, Guid childId, RecordStudySessionCommand command, CancellationToken cancellationToken);
     Task<IReadOnlyList<StudySessionView>?> ListAsync(string ownerUid, Guid childId, int limit, CancellationToken cancellationToken);
+    Task<StudySessionSummaryView?> GetSummaryAsync(string ownerUid, Guid childId, CancellationToken cancellationToken);
 }
