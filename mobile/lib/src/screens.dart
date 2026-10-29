@@ -70,7 +70,7 @@ class HomeScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             const Text(
-                'يعرض الملخص آخر 30 جلسة محفوظة فقط؛ الأهداف والنقاط والسلاسل لم تُربط بعد.',
+                'يشمل الإجمالي كل الجلسات المسجلة؛ الأهداف والنقاط والسلاسل لم تُربط بعد.',
                 style: TextStyle(color: Colors.black54, fontSize: 12)),
           ]),
         ),
@@ -139,8 +139,8 @@ class _HomeProgressCard extends ConsumerWidget {
       );
     }
 
-    final sessionsProvider = studySessionsForChildProvider(childId!);
-    return ref.watch(sessionsProvider).when(
+    final summaryProvider = studySessionSummaryForChildProvider(childId!);
+    return ref.watch(summaryProvider).when(
           loading: () => const Card(
             child: ListTile(
               leading: SizedBox.square(
@@ -160,11 +160,11 @@ class _HomeProgressCard extends ConsumerWidget {
                       style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 8),
                   const Text(
-                      'تعذر تحميل الجلسات المحفوظة. تحقق من الاتصال ثم أعد المحاولة.'),
+                      'تعذر تحميل ملخص الجلسات. تحقق من الاتصال ثم أعد المحاولة.'),
                   Align(
                     alignment: AlignmentDirectional.centerEnd,
                     child: TextButton(
-                      onPressed: () => ref.invalidate(sessionsProvider),
+                      onPressed: () => ref.invalidate(summaryProvider),
                       child: const Text('إعادة المحاولة'),
                     ),
                   ),
@@ -172,11 +172,7 @@ class _HomeProgressCard extends ConsumerWidget {
               ),
             ),
           ),
-          data: (sessions) {
-            final totalDurationSeconds = sessions.fold<int>(
-              0,
-              (total, session) => total + session.durationSeconds,
-            );
+          data: (summary) {
             return Column(
               children: [
                 Card(
@@ -189,7 +185,7 @@ class _HomeProgressCard extends ConsumerWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'الجلسات المحفوظة (آخر 30 كحد أقصى)',
+                            'الجلسات المحفوظة (كامل السجل)',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
@@ -204,7 +200,7 @@ class _HomeProgressCard extends ConsumerWidget {
                       child: _MetricCard(
                         icon: Icons.menu_book_outlined,
                         label: 'جلسة مسجلة',
-                        value: _arabicDigits(sessions.length),
+                        value: _arabicDigits(summary.sessionCount),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -212,7 +208,8 @@ class _HomeProgressCard extends ConsumerWidget {
                       child: _MetricCard(
                         icon: Icons.timer_outlined,
                         label: 'وقت التعلّم',
-                        value: _formatStudyDuration(totalDurationSeconds),
+                        value:
+                            _formatStudyDuration(summary.totalDurationSeconds),
                       ),
                     ),
                   ],

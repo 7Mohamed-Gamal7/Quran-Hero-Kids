@@ -287,6 +287,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
       await ref.read(studySessionsRepositoryProvider).record(childId, draft);
       if (!mounted) return;
       ref.invalidate(studySessionsForChildProvider(childId));
+      ref.invalidate(studySessionSummaryForChildProvider(childId));
       setState(() {
         _pendingDraft = null;
         _pendingChildId = null;

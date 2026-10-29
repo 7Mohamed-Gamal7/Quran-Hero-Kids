@@ -16,3 +16,8 @@ final studySessionsForChildProvider =
     FutureProvider.family<List<StudySessionRecord>, String>(
   (ref, childId) => ref.watch(studySessionsRepositoryProvider).list(childId),
 );
+
+final studySessionSummaryForChildProvider =
+    FutureProvider.family<StudySessionSummary, String>(
+  (ref, childId) => ref.watch(studySessionsRepositoryProvider).summary(childId),
+);

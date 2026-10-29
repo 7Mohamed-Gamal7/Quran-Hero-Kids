@@ -51,6 +51,31 @@ class StudySessionRecord {
   }
 }
 
+class StudySessionSummary {
+  const StudySessionSummary({
+    required this.sessionCount,
+    required this.totalDurationSeconds,
+  });
+
+  final int sessionCount;
+  final int totalDurationSeconds;
+
+  factory StudySessionSummary.fromJson(Map<String, dynamic> json) {
+    final sessionCount = json['sessionCount'];
+    final totalDurationSeconds = json['totalDurationSeconds'];
+    if (sessionCount is! int ||
+        sessionCount < 0 ||
+        totalDurationSeconds is! int ||
+        totalDurationSeconds < 0) {
+      throw const FormatException('Invalid study session summary.');
+    }
+    return StudySessionSummary(
+      sessionCount: sessionCount,
+      totalDurationSeconds: totalDurationSeconds,
+    );
+  }
+}
+
 /// Immutable payload created once when a timer finishes and retained for retries.
 class StudySessionDraft {
   StudySessionDraft({

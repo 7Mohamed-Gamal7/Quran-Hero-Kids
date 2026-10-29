@@ -27,12 +27,25 @@ class _FakeStudySessionsRepository implements StudySessionsRepository {
   final attempts = <StudySessionDraft>[];
   final saved = <StudySessionRecord>[];
   final listedChildIds = <String>[];
+  final summarizedChildIds = <String>[];
   bool failFirstRecord = false;
 
   @override
   Future<List<StudySessionRecord>> list(String childId) async {
     listedChildIds.add(childId);
     return List.unmodifiable(saved.reversed);
+  }
+
+  @override
+  Future<StudySessionSummary> summary(String childId) async {
+    summarizedChildIds.add(childId);
+    return StudySessionSummary(
+      sessionCount: saved.length,
+      totalDurationSeconds: saved.fold<int>(
+        0,
+        (total, session) => total + session.durationSeconds,
+      ),
+    );
   }
 
   @override
@@ -74,6 +87,22 @@ Widget _app(
                   ref.watch(activeChildIdProvider) ?? 'none',
                   key: const Key('active-child-state-probe'),
                 ),
+              ),
+              Consumer(
+                builder: (context, ref, child) {
+                  final childId = ref.watch(activeChildIdProvider);
+                  if (childId == null) return const SizedBox.shrink();
+                  return ref
+                      .watch(studySessionSummaryForChildProvider(childId))
+                      .when(
+                        data: (summary) => Text(
+                          '${summary.sessionCount}',
+                          key: const Key('summary-count-probe'),
+                        ),
+                        loading: () => const SizedBox.shrink(),
+                        error: (error, stackTrace) => const SizedBox.shrink(),
+                      );
+                },
               ),
             ],
           ),
@@ -176,6 +205,9 @@ void main() {
         repository.attempts.single.clientEventId);
     expect(find.text('تم تسجيل الجلسة بنجاح.'), findsOneWidget);
     expect(find.text('حفظ · 00:03'), findsOneWidget);
+    expect(repository.summarizedChildIds, hasLength(2));
+    expect(find.byKey(const Key('summary-count-probe')), findsOneWidget);
+    expect(find.text('1'), findsOneWidget);
   });
 
   testWidgets('retry keeps the exact event id and original payload',

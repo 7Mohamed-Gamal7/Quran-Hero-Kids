@@ -3,6 +3,7 @@ import '../domain/study_session.dart';
 
 abstract interface class StudySessionsRepository {
   Future<List<StudySessionRecord>> list(String childId);
+  Future<StudySessionSummary> summary(String childId);
   Future<StudySessionRecord> record(String childId, StudySessionDraft draft);
 }
 
@@ -24,6 +25,12 @@ class RestStudySessionsRepository implements StudySessionsRepository {
     return value
         .map((item) => StudySessionRecord.fromJson(_asMap(item)))
         .toList(growable: false);
+  }
+
+  @override
+  Future<StudySessionSummary> summary(String childId) async {
+    final value = await _apiClient.get('${_path(childId)}/summary');
+    return StudySessionSummary.fromJson(_asMap(value));
   }
 
   @override

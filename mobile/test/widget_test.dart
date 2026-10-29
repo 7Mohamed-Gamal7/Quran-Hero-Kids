@@ -116,12 +116,16 @@ void main() {
     expect(find.text('أضف ملف طفل لمتابعة أهدافه وتقدمه.'), findsOneWidget);
   });
 
-  testWidgets('home summary uses saved sessions for the active child',
+  testWidgets('home summary uses all-session totals for the active child',
       (tester) async {
     final sessionsRepository = _FakeStudySessionsRepository([
       _session('session-1', StudySessionKind.memorization, 125),
       _session('session-2', StudySessionKind.revision, 35),
-    ]);
+    ],
+        summaryOverride: const StudySessionSummary(
+          sessionCount: 31,
+          totalDurationSeconds: 496,
+        ));
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -141,10 +145,10 @@ void main() {
     await tester.tap(find.text('الرئيسية'));
     await tester.pumpAndSettle();
 
-    expect(sessionsRepository.listedChildIds, ['child-1']);
-    expect(find.text('٢'), findsOneWidget);
-    expect(find.text('٢ د ٤٠ ث'), findsOneWidget);
-    expect(find.text('الجلسات المحفوظة (آخر 30 كحد أقصى)'), findsOneWidget);
+    expect(sessionsRepository.summarizedChildIds, ['child-1']);
+    expect(find.text('٣١'), findsOneWidget);
+    expect(find.text('٨ د ١٦ ث'), findsOneWidget);
+    expect(find.text('الجلسات المحفوظة (كامل السجل)'), findsOneWidget);
   });
 }
 
@@ -205,15 +209,30 @@ class _SingleChildProfilesRepository implements ChildProfilesRepository {
 }
 
 class _FakeStudySessionsRepository implements StudySessionsRepository {
-  _FakeStudySessionsRepository(this.sessions);
+  _FakeStudySessionsRepository(this.sessions, {this.summaryOverride});
 
   final List<StudySessionRecord> sessions;
+  final StudySessionSummary? summaryOverride;
   final listedChildIds = <String>[];
+  final summarizedChildIds = <String>[];
 
   @override
   Future<List<StudySessionRecord>> list(String childId) async {
     listedChildIds.add(childId);
     return sessions;
+  }
+
+  @override
+  Future<StudySessionSummary> summary(String childId) async {
+    summarizedChildIds.add(childId);
+    return summaryOverride ??
+        StudySessionSummary(
+          sessionCount: sessions.length,
+          totalDurationSeconds: sessions.fold<int>(
+            0,
+            (total, session) => total + session.durationSeconds,
+          ),
+        );
   }
 
   @override

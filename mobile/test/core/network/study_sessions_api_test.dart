@@ -90,6 +90,29 @@ void main() {
     expect(sessions.single.occurredAt.isUtc, isTrue);
   });
 
+  test('loads the full session summary from the protected summary endpoint',
+      () async {
+    late http.Request request;
+    final repository = RestStudySessionsRepository(
+      apiClient: _client(MockClient((incoming) async {
+        request = incoming;
+        return _jsonResponse({
+          'sessionCount': 31,
+          'totalDurationSeconds': 496,
+        }, 200);
+      })),
+    );
+
+    final summary = await repository.summary(_childId);
+
+    expect(request.method, 'GET');
+    expect(
+        request.url.path, '/api/v1/children/$_childId/study-sessions/summary');
+    expect(request.headers['authorization'], 'Bearer test-id-token');
+    expect(summary.sessionCount, 31);
+    expect(summary.totalDurationSeconds, 496);
+  });
+
   test('generates a version 4 UUID event id', () {
     final draft = StudySessionDraft.create(
       kind: StudySessionKind.revision,
