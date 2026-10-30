@@ -117,6 +117,13 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - Targeted Flutter tests passed **14/14**; full Flutter suite passed **25/25**, analyzer reported no issues, and format found no changes across 23 Dart files. .NET baseline passed **40/40**, whitespace verification passed, and NuGet audit reported no vulnerable packages from configured sources. No backend, database, schema, or dependency changed today. P2.2 remains partial because goals, streaks, points, greeting identity, and genuine Firebase/API connectivity are not complete or live-tested.
 - Firebase installation/configuration and Quran source approval remain blocked as recorded in `docs/TASKS.md`; no content, credentials, cloud resource, workflow, or external service was used.
 
+## Follow-up verification on 2026-10-30
+
+- The home greeting now derives the name from the active child ID and the loaded family-profile provider, falling back to a generic greeting when no matching profile is available. The prototype name dialog/state was removed, and the home CTA now navigates to Family profile management. No child data model, backend, API, database, or dependency changed.
+- Drafted [`docs/product/progress-timezone-design.md`](product/progress-timezone-design.md) with proposed owner-timezone, DST, delayed-session, daily-goal, and streak rules. It is explicitly design-only: no backend contract/schema was added, and P2.1 still needs parent timezone configuration and product decisions.
+- Regression tests verify the active profile name alongside all-session totals and that the management CTA opens Family. The targeted home test file passed **5/5**; full Flutter suite passed **25/25**, `flutter analyze` reported no issues, and `dart format --output=none --set-exit-if-changed lib test` passed. A final full-suite rerun after the icon polish is recorded in `docs/TASKS.md`.
+- .NET was unchanged; the latest prior full baseline passed **40/40** with .NET whitespace verification and NuGet audit reporting no vulnerable packages from configured sources. No live API/Firebase test was possible because production client auth/configuration remains absent. Quran source approval, CI workflow permissions, and the owner decision on public repository visibility remain open; no content, credentials, workflows, cloud resources, or repository settings were changed.
+
 ## Priority findings
 
 1. **P0 — Flutter parent Firebase auth is absent.** Preserve fail-closed behavior. Add Firebase only after the active install permission gate allows it and real generated options are provided/configured.

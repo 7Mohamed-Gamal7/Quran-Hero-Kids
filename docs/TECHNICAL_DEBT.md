@@ -1,6 +1,6 @@
 # Technical Debt and Blockers
 
-**As of:** 2026-10-29 · Priorities are relative to a controlled beta and do not imply release approval.
+**As of:** 2026-10-30 · Priorities are relative to a controlled beta and do not imply release approval.
 
 | Priority | Finding | Impact | Evidence / prerequisite |
 |---|---|---|---|
@@ -13,7 +13,7 @@
 | P1 | Delete/export/retention is not executable | Families lack a verified lifecycle path for child/account data. | `docs/architecture/security.md`, `docs/architecture/data-model.md`; requires policy, market/legal review, and implementation. |
 | P1 | Release manifest networking needed explicit declaration | Release API/Firebase traffic may be unavailable without INTERNET in the merged app manifest. | `mobile/android/app/src/main/AndroidManifest.xml` now declares INTERNET; next Android release build must verify merge. |
 | P1 | Repository visibility needs owner confirmation | GitHub reports this repository as public; do not change visibility without explicit owner direction. Public visibility alone is not evidence that secrets or child data were exposed. | Read-only repository API check on 2026-10-25; no change was made. |
-| P2 | Home progress is partial and child name remains a prototype | Flutter now reads the protected all-session server summary, while detailed history remains on its existing list endpoint; successful session writes invalidate both providers. Daily goals, streaks, points, greeting name, and real auth are not fully account-backed; no live API/auth test has been performed. | `StudySessionSummary`, `studySessionSummaryForChildProvider`, `mobile/lib/src/screens.dart`; goal/streak rules and additional metrics remain open. |
+| P2 | Home progress is partial | Flutter reads the protected all-session server summary and greets using the matched active child profile name; detailed history remains on its list endpoint, and successful session writes invalidate both providers. Daily goals, streaks, and points are not implemented; genuine Firebase auth and live end-to-end API behavior remain unverified. | `StudySessionSummary`, `studySessionSummaryForChildProvider`, `activeChildIdProvider`, `mobile/lib/src/screens.dart`; goal/streak rules and real auth remain open. |
 | P2 | No CI workflow is present | Formatting, tests, dependency checks, and builds are not automatically gated. | No `.github/workflows/`; confirm workflow permissions/configuration before adding workflows. |
 | P2 | Flutter lockfile drift from local SDK | Modified lockfile downgraded transitive versions and changed committed Dart >=3.11 floor to local resolution >=3.8. | `mobile/pubspec.lock`; preserve until deliberate resolution with compatible SDK and authorized Firebase dependencies. |
 | P2 | Backend auth tests do not verify Firebase signatures | Tests prove authorization/ownership with synthetic test identity, not Firebase signature/issuer verification. | `backend/tests/QuranHero.Api.Tests/Infrastructure/IntegrationTestFactory.cs`; live verification is an external gate. |

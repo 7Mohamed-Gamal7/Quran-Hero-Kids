@@ -40,7 +40,8 @@
 
 ## Phase 4 — Progress and durable offline learning
 
-- **Partial (2026-10-27/29):** the home screen now derives session count and duration from the selected child's complete saved-session summary; the detailed learning history remains a separate list. Daily goals, streaks, points, and account-backed greeting remain open; no live API/auth connection was tested.
+- **Partial (2026-10-27/30):** the home screen derives session count and duration from the selected child's complete saved-session summary and greets with the matching active profile name; detailed learning history remains a separate list. Daily goals, streaks, points, genuine Firebase auth, and live API/auth verification remain open.
+- **P2.1 design draft (2026-10-30):** timezone/day-boundary, DST, delayed offline events, goal-effective dates, and streak semantics are proposed in [`docs/product/progress-timezone-design.md`](product/progress-timezone-design.md). This is not an implemented contract or migration; parent timezone storage and product decisions remain prerequisites.
 - Define goal/streak rules before displaying those metrics, then implement server-authoritative progress and offline behavior as approved.
 - Add a durable, appropriately protected outbox for pending study events, stable idempotency keys, retry/backoff, and visible sync status.
 - Implement tests, goals, achievements, and rewards only when content/session rules are defined and server-authoritative where needed.
