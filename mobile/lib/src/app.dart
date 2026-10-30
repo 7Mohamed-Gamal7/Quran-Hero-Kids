@@ -7,7 +7,6 @@ import 'screens.dart';
 enum AppTab { home, learn, tests, achievements, family }
 
 final selectedTabProvider = StateProvider<AppTab>((ref) => AppTab.home);
-final childNameProvider = StateProvider<String?>((ref) => null);
 
 class QuranHeroApp extends StatelessWidget {
   const QuranHeroApp({super.key});

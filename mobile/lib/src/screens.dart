@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app.dart';
 import 'features/children/data/children_providers.dart';
 import 'features/children/presentation/child_profiles_screen.dart';
+import 'features/children/presentation/children_controller.dart';
 import 'features/study/data/study_sessions_providers.dart';
 import 'features/study/presentation/study_session_screen.dart';
 
@@ -12,7 +13,19 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final name = ref.watch(childNameProvider);
+    final activeChildId = ref.watch(activeChildIdProvider);
+    final profiles = ref.watch(childProfilesControllerProvider);
+    final name = activeChildId == null
+        ? null
+        : profiles.maybeWhen<String?>(
+            data: (items) {
+              for (final profile in items) {
+                if (profile.id == activeChildId) return profile.name;
+              }
+              return null;
+            },
+            orElse: () => null,
+          );
     final colors = Theme.of(context).colorScheme;
     return CustomScrollView(
       slivers: [
@@ -38,7 +51,7 @@ class HomeScreen extends ConsumerWidget {
                   child: Icon(Icons.auto_awesome, color: colors.primary)),
             ]),
             const SizedBox(height: 24),
-            _HomeProgressCard(childId: ref.watch(activeChildIdProvider)),
+            _HomeProgressCard(childId: activeChildId),
             const SizedBox(height: 25),
             Text('رحلتك اليوم', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 12),
@@ -62,11 +75,10 @@ class HomeScreen extends ConsumerWidget {
                     AppTab.tests),
             const SizedBox(height: 16),
             OutlinedButton.icon(
-              onPressed: () => _addChild(context, ref),
-              icon: const Icon(Icons.person_add_alt_1),
-              label: Text(name == null
-                  ? 'إعداد ملف الطفل (نموذج أولي)'
-                  : 'تغيير اسم الطفل'),
+              onPressed: () =>
+                  ref.read(selectedTabProvider.notifier).state = AppTab.family,
+              icon: const Icon(Icons.family_restroom),
+              label: const Text('إدارة ملفات الأطفال'),
             ),
             const SizedBox(height: 8),
             const Text(
@@ -76,32 +88,6 @@ class HomeScreen extends ConsumerWidget {
         ),
       ],
     );
-  }
-
-  Future<void> _addChild(BuildContext context, WidgetRef ref) async {
-    final controller = TextEditingController();
-    final value = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('ملف الطفل'),
-        content: TextField(
-            controller: controller,
-            autofocus: true,
-            maxLength: 40,
-            decoration: const InputDecoration(labelText: 'الاسم المعروض')),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء')),
-          FilledButton(
-              onPressed: () => Navigator.pop(context, controller.text.trim()),
-              child: const Text('متابعة')),
-        ],
-      ),
-    );
-    controller.dispose();
-    if (value != null && value.isNotEmpty)
-      ref.read(childNameProvider.notifier).state = value;
   }
 }
 

@@ -95,6 +95,7 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: QuranHeroApp()));
 
     expect(find.text('مرحبًا ببطل القرآن'), findsOneWidget);
+    expect(find.text('إعداد ملف الطفل (نموذج أولي)'), findsNothing);
     expect(find.text('ملخص التعلّم'), findsOneWidget);
     expect(
       find.text('اختر ملف طفل من تبويب الأسرة لعرض جلساته المحفوظة.'),
@@ -103,6 +104,8 @@ void main() {
     expect(find.text('التعلّم'), findsOneWidget);
     expect(find.text('الأسرة'), findsOneWidget);
     expect(find.text('جلسة تعلّم'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('إدارة ملفات الأطفال'), 300);
+    expect(find.text('إدارة ملفات الأطفال'), findsOneWidget);
     expect(
       find.text('سجّل مدة نشاطك؛ فهرس القرآن والتلاوة غير متاحين بعد'),
       findsOneWidget,
@@ -116,7 +119,7 @@ void main() {
     expect(find.text('أضف ملف طفل لمتابعة أهدافه وتقدمه.'), findsOneWidget);
   });
 
-  testWidgets('home summary uses all-session totals for the active child',
+  testWidgets('home uses active profile name and all-session totals',
       (tester) async {
     final sessionsRepository = _FakeStudySessionsRepository([
       _session('session-1', StudySessionKind.memorization, 125),
@@ -145,10 +148,16 @@ void main() {
     await tester.tap(find.text('الرئيسية'));
     await tester.pumpAndSettle();
 
+    expect(find.text('أهلًا يا ليان'), findsOneWidget);
     expect(sessionsRepository.summarizedChildIds, ['child-1']);
     expect(find.text('٣١'), findsOneWidget);
     expect(find.text('٨ د ١٦ ث'), findsOneWidget);
     expect(find.text('الجلسات المحفوظة (كامل السجل)'), findsOneWidget);
+
+    await tester.scrollUntilVisible(find.text('إدارة ملفات الأطفال'), 300);
+    await tester.tap(find.text('إدارة ملفات الأطفال'));
+    await tester.pumpAndSettle();
+    expect(find.text('لوحة الأسرة'), findsOneWidget);
   });
 }
 
