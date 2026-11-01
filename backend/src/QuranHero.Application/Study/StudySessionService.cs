@@ -26,9 +26,14 @@ public sealed class StudySessionService(
         }
 
         var session = new StudySession(childId, command.ClientEventId, command.Kind, command.DurationSeconds, command.OccurredAt);
-        await sessions.AddAsync(session, cancellationToken);
-        await sessions.SaveChangesAsync(cancellationToken);
-        return new RecordStudySessionResult(ToView(session), WasDuplicate: false);
+        var persisted = await sessions.AddOrGetExistingAsync(session, cancellationToken);
+        var payloadMatches = persisted.Kind == command.Kind &&
+                             persisted.DurationSeconds == command.DurationSeconds &&
+                             persisted.OccurredAt == command.OccurredAt.UtcDateTime;
+        return new RecordStudySessionResult(
+            ToView(persisted),
+            WasDuplicate: persisted.Id != session.Id && payloadMatches,
+            IsConflict: !payloadMatches);
     }
 
     public async Task<IReadOnlyList<StudySessionView>?> ListAsync(

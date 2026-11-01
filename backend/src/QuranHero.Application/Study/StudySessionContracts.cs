@@ -25,8 +25,7 @@ public interface IStudySessionRepository
     Task<StudySession?> FindByClientEventIdAsync(Guid childId, Guid clientEventId, CancellationToken cancellationToken);
     Task<IReadOnlyList<StudySession>> ListAsync(Guid childId, int limit, CancellationToken cancellationToken);
     Task<StudySessionSummaryView> GetSummaryAsync(Guid childId, CancellationToken cancellationToken);
-    Task AddAsync(StudySession session, CancellationToken cancellationToken);
-    Task SaveChangesAsync(CancellationToken cancellationToken);
+    Task<StudySession> AddOrGetExistingAsync(StudySession session, CancellationToken cancellationToken);
 }
 
 public interface IStudySessionService

@@ -44,6 +44,7 @@ public sealed class StudySessionsController(IStudySessionService service) : Cont
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(StudySessionView), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(StudySessionView), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

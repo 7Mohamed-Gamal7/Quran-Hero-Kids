@@ -53,11 +53,13 @@ public sealed class OpenApiContractTests : IClassFixture<IntegrationTestFactory>
         AssertBearerRequired(sessionsPost);
         AssertHasResponse(sessionsGet, "400");
         AssertHasResponse(sessionsGet, "404");
+        AssertHasResponse(sessionsPost, "200");
         AssertHasResponse(sessionsPost, "201");
         AssertHasResponse(sessionsPost, "400");
         AssertHasResponse(sessionsPost, "401");
         AssertHasResponse(sessionsPost, "404");
         AssertHasResponse(sessionsPost, "409");
+        AssertResponseSchema(sessionsPost, "200", "StudySessionView");
         AssertResponseSchema(sessionsPost, "201", "StudySessionView");
 
         var sessionSummary = paths.GetProperty(

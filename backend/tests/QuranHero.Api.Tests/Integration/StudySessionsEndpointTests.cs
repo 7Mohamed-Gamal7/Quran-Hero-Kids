@@ -58,6 +58,80 @@ public sealed class StudySessionsEndpointTests : IClassFixture<IntegrationTestFa
         Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
     }
 
+    [Fact]
+    public async Task RecordSession_ConcurrentRetriesWithSamePayloadAreIdempotent()
+    {
+        var owner = $"parent-{Guid.NewGuid():N}";
+        var childId = await CreateChildAsync(owner);
+        var eventId = Guid.NewGuid();
+        var occurredAt = DateTimeOffset.UtcNow;
+        var path = $"/api/v1/children/{childId}/study-sessions";
+
+        async Task<HttpStatusCode> SendAsync()
+        {
+            using var request = NewRequest(HttpMethod.Post, path, owner);
+            request.Content = JsonContent.Create(new
+            {
+                clientEventId = eventId,
+                kind = "revision",
+                durationSeconds = 90,
+                occurredAt
+            });
+            using var response = await _client.SendAsync(request);
+            return response.StatusCode;
+        }
+
+        var responses = await Task.WhenAll(SendAsync(), SendAsync());
+
+        Assert.Single(responses, status => status == HttpStatusCode.Created);
+        Assert.Single(responses, status => status == HttpStatusCode.OK);
+
+        using var list = await _client.SendAsync(
+            NewRequest(HttpMethod.Get, path, owner));
+        Assert.Equal(HttpStatusCode.OK, list.StatusCode);
+        var sessions = await list.Content.ReadFromJsonAsync<IReadOnlyList<SessionResponse>>();
+        Assert.NotNull(sessions);
+        Assert.Single(sessions);
+        Assert.Equal(eventId, sessions[0].ClientEventId);
+    }
+
+    [Fact]
+    public async Task RecordSession_ConcurrentRetriesWithDifferentPayloadsReturnConflict()
+    {
+        var owner = $"parent-{Guid.NewGuid():N}";
+        var childId = await CreateChildAsync(owner);
+        var eventId = Guid.NewGuid();
+        var occurredAt = DateTimeOffset.UtcNow;
+        var path = $"/api/v1/children/{childId}/study-sessions";
+
+        async Task<HttpStatusCode> SendAsync(int durationSeconds)
+        {
+            using var request = NewRequest(HttpMethod.Post, path, owner);
+            request.Content = JsonContent.Create(new
+            {
+                clientEventId = eventId,
+                kind = "revision",
+                durationSeconds,
+                occurredAt
+            });
+            using var response = await _client.SendAsync(request);
+            return response.StatusCode;
+        }
+
+        var responses = await Task.WhenAll(SendAsync(90), SendAsync(120));
+
+        Assert.Single(responses, status => status == HttpStatusCode.Created);
+        Assert.Single(responses, status => status == HttpStatusCode.Conflict);
+
+        using var list = await _client.SendAsync(
+            NewRequest(HttpMethod.Get, path, owner));
+        Assert.Equal(HttpStatusCode.OK, list.StatusCode);
+        var sessions = await list.Content.ReadFromJsonAsync<IReadOnlyList<SessionResponse>>();
+        Assert.NotNull(sessions);
+        Assert.Single(sessions);
+        Assert.Equal(eventId, sessions[0].ClientEventId);
+    }
+
     [Theory]
     [InlineData("unknown", 60)]
     [InlineData("revision", 0)]

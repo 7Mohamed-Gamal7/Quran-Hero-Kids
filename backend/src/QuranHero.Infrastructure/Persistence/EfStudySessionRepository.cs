@@ -11,10 +11,23 @@ public sealed class EfStudySessionRepository(QuranHeroDbContext db) : IStudySess
             item => item.ChildId == childId && item.ClientEventId == clientEventId,
             cancellationToken);
 
-    public async Task AddAsync(StudySession session, CancellationToken cancellationToken) =>
+    public async Task<StudySession> AddOrGetExistingAsync(StudySession session, CancellationToken cancellationToken)
+    {
         await db.StudySessions.AddAsync(session, cancellationToken);
-
-    public Task SaveChangesAsync(CancellationToken cancellationToken) => db.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await db.SaveChangesAsync(cancellationToken);
+            return session;
+        }
+        catch (DbUpdateException)
+        {
+            db.Entry(session).State = EntityState.Detached;
+            var existing = await FindByClientEventIdAsync(
+                session.ChildId, session.ClientEventId, cancellationToken);
+            if (existing is null) throw;
+            return existing;
+        }
+    }
 
     public async Task<IReadOnlyList<StudySession>> ListAsync(Guid childId, int limit, CancellationToken cancellationToken) =>
         await db.StudySessions
