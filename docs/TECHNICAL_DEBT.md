@@ -1,6 +1,6 @@
 # Technical Debt and Blockers
 
-**As of:** 2026-10-30 · Priorities are relative to a controlled beta and do not imply release approval.
+**As of:** 2026-11-01 · Priorities are relative to a controlled beta and do not imply release approval.
 
 | Priority | Finding | Impact | Evidence / prerequisite |
 |---|---|---|---|
@@ -18,3 +18,4 @@
 | P2 | Flutter lockfile drift from local SDK | Modified lockfile downgraded transitive versions and changed committed Dart >=3.11 floor to local resolution >=3.8. | `mobile/pubspec.lock`; preserve until deliberate resolution with compatible SDK and authorized Firebase dependencies. |
 | P2 | Backend auth tests do not verify Firebase signatures | Tests prove authorization/ownership with synthetic test identity, not Firebase signature/issuer verification. | `backend/tests/QuranHero.Api.Tests/Infrastructure/IntegrationTestFactory.cs`; live verification is an external gate. |
 | P2 | Accessibility and release-device breadth not established | Narrow-screen/200% widget tests cover home, child-profile dialog, and study-session screen; semantics tests cover navigation, timer updates, and the child-profile optional age-band hint (2026-10-26). Broader screen-reader, scaling, contrast, platform, and device checks remain. | `mobile/test/widget_test.dart`, `mobile/test/features/study/presentation/study_session_screen_test.dart`, `mobile/test/features/children/presentation/child_profiles_screen_test.dart`; targeted local widget tests are not device or full accessibility certification. |
+| P2 | Concurrent session idempotency is not verified against the production provider | Regression tests currently exercise SQLite in-memory only; SQL Server/Azure SQL exception and independent-connection behavior remain unverified. | `backend/tests/QuranHero.Api.Tests/Infrastructure/IntegrationTestFactory.cs`, `StudySessionsEndpointTests.cs`; validate only against an authorized isolated test database, never production. |

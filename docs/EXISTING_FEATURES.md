@@ -1,6 +1,6 @@
 # Existing Features and Current Status
 
-**As of:** 2026-10-30
+**As of:** 2026-11-01
 
 Statuses describe implementation in this checkout—not planned architecture or release readiness.
 
@@ -12,7 +12,7 @@ Statuses describe implementation in this checkout—not planned architecture or 
 | Protected API client | **Implemented, fail-closed** | `mobile/lib/src/core/network/api_client.dart` refuses a missing API URL or token; provider wiring currently returns `MissingTokenProvider`. |
 | Child profiles | **Implemented** | Flutter screens/repository and authenticated API support list/create/edit/archive. No separate child account exists. |
 | Active child selection | **Partial** | Shared in-memory selection is used by family and learning/session flows; archiving the selected child falls back to another active profile or clears the selection, and starting a session on the default profile records it as active. Not persisted or scoped to parent identity across restart. |
-| Study session capture/history | **Implemented, network-dependent** | Timer, session kind/duration, stable UUID event ID, history, and retry with the same payload are present. Retry drafts remain screen-memory-only. |
+| Study session capture/history | **Implemented, network-dependent** | Timer, session kind/duration, stable UUID event ID, history, and same-payload retries are present; concurrent duplicate inserts resolve to one stored session (200 for the matching payload, 409 for a conflicting payload). Integration coverage currently uses SQLite; retry drafts remain screen-memory-only and the production SQL Server provider was not tested live. |
 | Offline delivery | **Absent** | No durable outbox, background sync, retry-backoff queue, or conflict UI. |
 | Dashboard progress | **Partial** | Home derives count and total duration from the selected child's complete owner-scoped API summary, with explicit no-selection/loading/error states; detailed history remains a separate list and summary refreshes after a successful session save. Greeting uses the matching active child profile name, or a generic greeting if no profile is available. Goals, streaks, and points remain unimplemented; no live API/auth test. |
 | Quran text/audio | **Blocked / absent** | `docs/product/content-sources.md` records no owner approval. No source integration or bundled text/audio exists. |
