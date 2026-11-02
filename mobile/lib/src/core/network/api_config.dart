@@ -10,9 +10,7 @@ class ApiConfig {
     final value = baseUrl.trim();
     if (value.isEmpty) return false;
     final uri = Uri.tryParse(value);
-    return uri != null &&
-        (uri.scheme == 'http' || uri.scheme == 'https') &&
-        uri.host.isNotEmpty;
+    return uri != null && uri.scheme == 'https' && uri.host.isNotEmpty;
   }
 
   Uri get uri {

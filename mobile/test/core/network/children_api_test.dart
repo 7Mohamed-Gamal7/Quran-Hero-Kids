@@ -145,4 +145,26 @@ void main() {
     );
     expect(calls, 0);
   });
+
+  test('does not send a bearer token to an HTTP API URL', () async {
+    var calls = 0;
+    final client = ApiClient(
+      config: const ApiConfig(baseUrl: 'http://api.example.test'),
+      tokenProvider: _TokenProvider(),
+      httpClient: MockClient((_) async {
+        calls++;
+        return http.Response('[]', 200);
+      }),
+    );
+
+    await expectLater(
+      client.get('/api/v1/children'),
+      throwsA(isA<ApiException>().having(
+        (error) => error.type,
+        'type',
+        ApiFailureType.configuration,
+      )),
+    );
+    expect(calls, 0);
+  });
 }
