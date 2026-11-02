@@ -131,6 +131,13 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - Targeted session/OpenAPI tests passed **14/14**; full .NET suite passed **42/42**. `.NET format whitespace --verify-no-changes`, `git diff --check`, and NuGet vulnerability audit passed; NuGet reported no vulnerable packages against the current source. The API test fixture uses SQLite in-memory; no live SQL Server/Azure SQL concurrency test was run. Flutter did not change; its latest recorded full suite remains **25/25** with analyzer/format passing on 2026-10-30.
 - Firebase client auth/configuration and the package permission gate remain unresolved; Quran text/audio source terms still require the owner's explicit choice/approval; no CI workflows exist and workflow permission is unconfirmed; repository visibility was not changed and owner direction remains outstanding. No credentials, child PII, Quran text/audio, production DB, or paid cloud resource was used.
 
+## Follow-up verification on 2026-11-02
+
+- Repository synchronized at `master` / `origin/master` `c33abf9` with a clean worktree before changes. A seven-area structural review covered backend, Flutter/UX, security/privacy, tests, dependencies/platform setup, project documentation, and repository structure.
+- Static review found that `ApiConfig` accepted `http` even though `ApiClient` attaches an Authorization Bearer header and the security baseline requires TLS. The configuration now accepts only HTTPS URLs; tests cover HTTPS acceptance, HTTP and malformed URL rejection, and that an HTTP URL is rejected before the client transport is called (so no bearer request is sent).
+- Targeted Flutter networking tests passed **8/8**; full Flutter suite passed **29/29**, analyzer reported no issues, formatter found no changes in **24** Dart files, and `git diff --check` passed. Backend did not change; the latest full .NET run remains the recorded **42/42** from 2026-11-01. No live API/TLS endpoint or certificate was tested.
+- P3.2 remains open for rate limiting, CORS/security headers, data lifecycle, logging review, threat modeling, and broader isolation tests. Firebase setup/install permission, Quran-source approval, CI workflow permission, and owner direction on public repository visibility remain unresolved. No credentials, Quran content, production services, or paid resources were used.
+
 ## Priority findings
 
 1. **P0 — Flutter parent Firebase auth is absent.** Preserve fail-closed behavior. Add Firebase only after the active install permission gate allows it and real generated options are provided/configured.
