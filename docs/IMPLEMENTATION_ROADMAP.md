@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-**Status date:** 2026-11-02. This is the forward-looking backlog; `docs/TASKS.md` remains the execution history and daily verification ledger.
+**Status date:** 2026-11-03. This is the forward-looking backlog; `docs/TASKS.md` remains the execution history and daily verification ledger.
 
 ## Phase 0 — Baseline and safe release foundations
 
@@ -26,6 +26,7 @@
 ## Phase 2 — Family state and data lifecycle
 
 - Persist active child selection paired with parent UID; restore only for matching UID and a current, non-archived child. Clear on logout/account switch/stale selection. **Partial (2026-10-21/22):** archiving the active child now selects the first remaining active profile or clears selection when none remain; starting a session with the default profile now stores that selection in shared in-memory state. Persistent UID-scoped restoration still awaits parent auth.
+- **Mutation/refresh separation (2026-11-03):** successful create/edit/archive operations remain successful if the subsequent profile-list refresh fails; the controller temporarily derives the visible profiles from the confirmed mutation result to avoid encouraging duplicate writes. Regression tests cover all three operations. This does not implement persistent selection or account lifecycle.
 - Define and implement account/child export, deletion, retention, and archive semantics; review applicable markets before beta.
 - Add privacy-safe account-scoped caching only where justified.
 

@@ -1,9 +1,10 @@
 # Quran Hero Kids — Project Audit
 
-**Audit date:** 2026-10-18 (Africa/Cairo)  
-**Checkout:** branch `feat/firebase-parent-auth-audit`, commit `cd7720d650a995e0233cf0d38d8c5766286414b0` (`docs: record active child selection milestone`)  
-**Remote baseline:** `origin/master` matched the checkout at audit time.  
-**Scope:** inspection of current implementation and docs plus fresh local checks. This is not a production, Firebase, privacy-law, licensing, or deployment certification.
+**Original audit date:** 2026-10-18 (Africa/Cairo)
+**Original checkout:** branch `feat/firebase-parent-auth-audit`, commit `cd7720d650a995e0233cf0d38d8c5766286414b0` (`docs: record active child selection milestone`)
+**Original remote baseline:** `origin/master` matched the checkout at audit time.
+**Latest follow-up:** 2026-11-03; see dated follow-up sections below. Current execution history and test results are tracked in [`docs/TASKS.md`](TASKS.md).
+**Scope:** the dated sections record local source/document checks and tests as performed. This is not a production, Firebase, privacy-law, licensing, or deployment certification.
 
 ## Checkout and preserved changes
 
@@ -137,6 +138,14 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - Static review found that `ApiConfig` accepted `http` even though `ApiClient` attaches an Authorization Bearer header and the security baseline requires TLS. The configuration now accepts only HTTPS URLs; tests cover HTTPS acceptance, HTTP and malformed URL rejection, and that an HTTP URL is rejected before the client transport is called (so no bearer request is sent).
 - Targeted Flutter networking tests passed **8/8**; full Flutter suite passed **29/29**, analyzer reported no issues, formatter found no changes in **24** Dart files, and `git diff --check` passed. Backend did not change; the latest full .NET run remains the recorded **42/42** from 2026-11-01. No live API/TLS endpoint or certificate was tested.
 - P3.2 remains open for rate limiting, CORS/security headers, data lifecycle, logging review, threat modeling, and broader isolation tests. Firebase setup/install permission, Quran-source approval, CI workflow permission, and owner direction on public repository visibility remain unresolved. No credentials, Quran content, production services, or paid resources were used.
+
+## Follow-up verification on 2026-11-03
+
+- Repository fetch confirmed a clean, synchronized `master` / `origin/master` at `9cee6a3` before work. A seven-area structural review covered backend, Flutter/UX, security/privacy, tests, dependencies/platforms, documentation, and repository inventory. A candidate concern about numeric session-kind parsing was not treated as an API vulnerability: request validation includes a regular expression and `[ApiController]` automatic model validation; no backend change was made.
+- Review found a confirmed state-reporting issue in `ChildProfilesController`: mutation and subsequent list reload shared one `try`, so a successful server create/edit/archive followed by a failed list refresh returned `false` and could prompt duplicate writes. The controller now reports write success and derives a temporary visible profile list from the confirmed mutation response when refresh fails. Regression tests cover create, edit, and archive.
+- The controller + family-screen tests passed **10/10**; full Flutter suite passed **32/32**, `flutter analyze` reported no issues, Dart formatter found no changes in **25** files, and `git diff --check` passed.
+- .NET baseline: the first targeted `StudySessionsEndpointTests` run reported **12 passed / 1 failed** with SQLite error `unable to delete/modify user-function due to active statements` while initializing a connection in the conflicting concurrent retry test. The failing test then passed alone (**1/1**) and the complete targeted class passed on rerun (**13/13**); backend source was not changed. This is a potentially intermittent fixture/concurrency issue requiring follow-up, not a reproducible test failure. The full .NET suite was not run today; latest recorded complete suite remains **42/42** on 2026-11-01. Follow up under P3.7 in `docs/TASKS.md`.
+- Firebase client configuration/install permission, Quran-source owner approval, CI workflow permission, production-provider testing, privacy lifecycle controls, and owner direction on public repository visibility remain open. No Quran content, credentials, live API, production database, or paid resources were used.
 
 ## Priority findings
 
