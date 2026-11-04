@@ -3,7 +3,7 @@
 **Original audit date:** 2026-10-18 (Africa/Cairo)
 **Original checkout:** branch `feat/firebase-parent-auth-audit`, commit `cd7720d650a995e0233cf0d38d8c5766286414b0` (`docs: record active child selection milestone`)
 **Original remote baseline:** `origin/master` matched the checkout at audit time.
-**Latest follow-up:** 2026-11-03; see dated follow-up sections below. Current execution history and test results are tracked in [`docs/TASKS.md`](TASKS.md).
+**Latest follow-up:** 2026-11-04; see dated follow-up sections below. Current execution history and test results are tracked in [`docs/TASKS.md`](TASKS.md).
 **Scope:** the dated sections record local source/document checks and tests as performed. This is not a production, Firebase, privacy-law, licensing, or deployment certification.
 
 ## Checkout and preserved changes
@@ -24,13 +24,13 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - `docs/`: product, source approval, architecture, data model, security, migration procedure, task history, and plan.
 - `.github/`: pull request template only; no `.github/workflows/` directory exists.
 
-## Verified implementation status
+## Verified implementation status at the original audit (2026-10-18)
 
 - Backend validates Firebase JWT authority, issuer, audience, and lifetime when configured; unconfigured Firebase auth fails closed. Controllers derive owner UID from verified claims and call owner-scoped services.
 - Flutter defines a `TokenProvider`, but production wiring returns `MissingTokenProvider`; `ApiClient` blocks before sending if the token is absent/empty.
 - Firebase client initialization, parent email/password screens, sign-out, and auth gate are absent. No FlutterFire-generated options or platform app config were found.
 - Child profiles support list/create/edit/archive; study sessions have stable event IDs and backend idempotency. Active-child choice and retry drafts are memory-only; there is no durable outbox.
-- Dashboard progress, tests, and achievements include placeholders. Follow-up on 2026-10-19 corrected the home action copy so it no longer implies that a surah/recitation index is available; metrics remain prototype values.
+- At the original 2026-10-18 audit, dashboard metrics, tests, and achievements included placeholders. Later dated follow-ups superseded the dashboard metrics: it now reads session count/duration from the server summary and greets by the active profile; daily goals, streaks, tests, and achievements remain unimplemented.
 - `docs/product/content-sources.md` states that no source is approved. No Quran content or audio was fetched or added.
 - Main Android manifest previously omitted INTERNET while debug/profile manifests contain it. This audit adds the permission to the main manifest; merged release-manifest verification remains pending.
 - Production database migrations are separate from application startup and documented in `docs/operations/database-migrations.md`. No database was accessed or migrated.
@@ -146,6 +146,15 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - The controller + family-screen tests passed **10/10**; full Flutter suite passed **32/32**, `flutter analyze` reported no issues, Dart formatter found no changes in **25** files, and `git diff --check` passed.
 - .NET baseline: the first targeted `StudySessionsEndpointTests` run reported **12 passed / 1 failed** with SQLite error `unable to delete/modify user-function due to active statements` while initializing a connection in the conflicting concurrent retry test. The failing test then passed alone (**1/1**) and the complete targeted class passed on rerun (**13/13**); backend source was not changed. This is a potentially intermittent fixture/concurrency issue requiring follow-up, not a reproducible test failure. The full .NET suite was not run today; latest recorded complete suite remains **42/42** on 2026-11-01. Follow up under P3.7 in `docs/TASKS.md`.
 - Firebase client configuration/install permission, Quran-source owner approval, CI workflow permission, production-provider testing, privacy lifecycle controls, and owner direction on public repository visibility remain open. No Quran content, credentials, live API, production database, or paid resources were used.
+
+## Follow-up verification on 2026-11-04
+
+- Repository fetch confirmed clean, synchronized `master` / `origin/master` at `a985b16` before changes. A seven-area structural review covered backend, Flutter/Riverpod, security/privacy, tests, dependencies/platform setup, docs/task history, and architecture/release readiness. Higher-impact auth, approved-content, session-outbox, deletion/export, signing, CI, and environment-validation work remains gated by credentials, approvals, policy, or owner-managed environments; no external resource was used.
+- Mobile review found `ApiClient` caught request-send exceptions but read `response.stream.bytesToString()` outside the network handling boundary. A new test first failed with a raw `SocketException` after simulated HTTP headers; the read now shares the transport `try` and the failure maps to `ApiFailureType.network`. HTTP status handling and JSON decode errors remain separate.
+- Static release/operations review found that Android `buildTypes.release` currently selects the debug signing configuration (`mobile/android/app/build.gradle.kts:32-37`), and `/health` returns a constant `ok` without checking database readiness (`backend/src/QuranHero.Api/Program.cs:63-67`). Both were recorded as open release gates; no build or service check was run, and no signing key or database environment was accessed.
+- Targeted networking tests passed **13/13**; complete Flutter suite passed **33/33**; `flutter analyze` reported no issues; formatter found no changes in **25** files; `git diff --check` passed. .NET tests were not run because no backend code changed. P3.7's intermittent SQLite test fixture issue remains open.
+- Documentation review found the original audit's dashboard status was stale and the Dart debt row conflated project and lockfile constraints. The audit now labels the 2026-10-18 snapshot and notes the later summary/greeting implementation. The debt record now accurately states `pubspec.yaml` Dart `>=3.4.0`, while `pubspec.lock` requires Dart `>=3.8.0-0` and Flutter `>=3.18.0-18.0.pre.54`; neither manifest nor lockfile was changed. Local Markdown links were checked; none are broken.
+- No Firebase credentials, Quran content/source calls, production database, live endpoint, paid resource, or child PII was used. No deployment/build publication is claimed.
 
 ## Priority findings
 

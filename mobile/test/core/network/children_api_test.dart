@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -20,6 +21,15 @@ ApiClient _client(MockClient client) => ApiClient(
       tokenProvider: _TokenProvider(),
       httpClient: client,
     );
+
+class _FailingResponseBodyClient extends http.BaseClient {
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async =>
+      http.StreamedResponse(
+        Stream<List<int>>.error(const SocketException('connection reset')),
+        200,
+      );
+}
 
 Map<String, dynamic> _child(String id) => {
       'id': id,
@@ -107,6 +117,23 @@ void main() {
             .having((error) => error.statusCode, 'statusCode', 401)
             .having((error) => error.message, 'message', 'Unauthorized'),
       ),
+    );
+  });
+
+  test('maps response body stream failures to a network error', () async {
+    final client = ApiClient(
+      config: const ApiConfig(baseUrl: 'https://api.example.test'),
+      tokenProvider: _TokenProvider(),
+      httpClient: _FailingResponseBodyClient(),
+    );
+
+    await expectLater(
+      client.get('/api/v1/children'),
+      throwsA(isA<ApiException>().having(
+        (error) => error.type,
+        'type',
+        ApiFailureType.network,
+      )),
     );
   });
 

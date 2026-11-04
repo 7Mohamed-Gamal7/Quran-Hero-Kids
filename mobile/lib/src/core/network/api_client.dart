@@ -60,8 +60,10 @@ class ApiClient {
     }
 
     http.StreamedResponse response;
+    late final String responseBody;
     try {
       response = await _httpClient.send(request);
+      responseBody = await response.stream.bytesToString();
     } on Exception catch (error) {
       throw ApiException(
         type: ApiFailureType.network,
@@ -69,7 +71,6 @@ class ApiClient {
       );
     }
 
-    final responseBody = await response.stream.bytesToString();
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw ApiException(
         type: ApiFailureType.http,
