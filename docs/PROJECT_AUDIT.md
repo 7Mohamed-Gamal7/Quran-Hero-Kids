@@ -3,7 +3,7 @@
 **Original audit date:** 2026-10-18 (Africa/Cairo)
 **Original checkout:** branch `feat/firebase-parent-auth-audit`, commit `cd7720d650a995e0233cf0d38d8c5766286414b0` (`docs: record active child selection milestone`)
 **Original remote baseline:** `origin/master` matched the checkout at audit time.
-**Latest follow-up:** 2026-11-04; see dated follow-up sections below. Current execution history and test results are tracked in [`docs/TASKS.md`](TASKS.md).
+**Latest follow-up:** 2026-11-05; see dated follow-up sections below. Current execution history and test results are tracked in [`docs/TASKS.md`](TASKS.md).
 **Scope:** the dated sections record local source/document checks and tests as performed. This is not a production, Firebase, privacy-law, licensing, or deployment certification.
 
 ## Checkout and preserved changes
@@ -156,7 +156,15 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - Documentation review found the original audit's dashboard status was stale and the Dart debt row conflated project and lockfile constraints. The audit now labels the 2026-10-18 snapshot and notes the later summary/greeting implementation. The debt record now accurately states `pubspec.yaml` Dart `>=3.4.0`, while `pubspec.lock` requires Dart `>=3.8.0-0` and Flutter `>=3.18.0-18.0.pre.54`; neither manifest nor lockfile was changed. Local Markdown links were checked; none are broken.
 - No Firebase credentials, Quran content/source calls, production database, live endpoint, paid resource, or child PII was used. No deployment/build publication is claimed.
 
-## Priority findings
+## Follow-up verification on 2026-11-05
+
+- Repository fetch confirmed a clean, synchronized `master` / `origin/master` at `3df92df` before work. A seven-area review covered backend/API reliability, Flutter state and UX, child privacy/security, test quality, dependencies/platform configuration, documentation, and release readiness.
+- Mobile review confirmed that `ApiClient._errorMessage` returned server-supplied `detail/title/message`, and the child-profile screen displayed `ApiException.message` verbatim. A regression test first failed with an injected internal SQL path and synthetic child name. The client now selects stable Arabic user-facing messages from the HTTP status code; the numeric `statusCode` remains available on the exception. Tests cover 400, 401, 403, 404, 409, 422, 500, and an unrecognized code, and assert the injected detail is not returned.
+- Network tests passed **20/20**; full Flutter tests passed **40/40**; `flutter analyze` reported no issues; formatter found no changes in **25** files; `git diff --check` passed. .NET tests were not run because backend code did not change.
+- The review also confirmed open gates already tracked: release signing uses the debug configuration, `/health` is liveness-only and does not check DB readiness, Firebase client auth lacks approved installation/configuration, and no Quran content source is approved. A specific coverage gap for HTTP 409 and malformed successful responses in the study-session REST repository was recorded as P3.9. README now documents Flutter tests and analysis commands.
+- No Firebase credentials, Quran source/content, production database, live endpoint, paid resource, or child PII was used. No Android release artifact or deployment is claimed.
+
+## Priority findings from the original audit (2026-10-18)
 
 1. **P0 — Flutter parent Firebase auth is absent.** Preserve fail-closed behavior. Add Firebase only after the active install permission gate allows it and real generated options are provided/configured.
 2. **P0 — Android release networking.** Main manifest now declares INTERNET; verify the merged release manifest during the next Android build.

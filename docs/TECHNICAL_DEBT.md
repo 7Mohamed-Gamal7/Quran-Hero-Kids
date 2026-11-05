@@ -1,6 +1,6 @@
 # Technical Debt and Blockers
 
-**As of:** 2026-11-04 · Priorities are relative to a controlled beta and do not imply release approval.
+**As of:** 2026-11-05 · Priorities are relative to a controlled beta and do not imply release approval.
 
 | Priority | Finding | Impact | Evidence / prerequisite |
 |---|---|---|---|

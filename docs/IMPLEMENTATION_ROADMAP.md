@@ -1,12 +1,13 @@
 # Implementation Roadmap
 
-**Status date:** 2026-11-04. This is the forward-looking backlog; `docs/TASKS.md` remains the execution history and daily verification ledger.
+**Status date:** 2026-11-05. This is the forward-looking backlog; `docs/TASKS.md` remains the execution history and daily verification ledger.
 
 ## Phase 0 — Baseline and safe release foundations
 
 - [x] Verify checkout, test/lint baselines, documentation gaps, content gate, and existing user changes.
 - [x] Require HTTPS for Flutter `API_BASE_URL` before attaching protected Bearer tokens; covered by config and no-transport regression tests. This does not verify a live server's TLS configuration.
 - [x] Normalize request-send and response-body stream exceptions as network failures in `ApiClient`; regression-tested a stream disconnect after headers. This does not add request timeouts or verify a live endpoint.
+- [x] Map HTTP errors to stable, localized client messages rather than displaying server-provided `detail/title/message`; tests cover common status codes and untrusted error text. The raw HTTP status remains available to application logic; this does not replace server-side error handling or live security review.
 - [x] Correct Android main manifest to declare INTERNET permission; still verify merged release manifest/build.
 - [ ] Resolve Flutter lockfile deliberately with the supported Dart/Flutter SDK; avoid unrelated dependency downgrades.
 - [ ] Establish CI for .NET and Flutter after confirming workflow permissions.
