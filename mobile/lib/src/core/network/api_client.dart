@@ -75,7 +75,7 @@ class ApiClient {
       throw ApiException(
         type: ApiFailureType.http,
         statusCode: response.statusCode,
-        message: _errorMessage(responseBody, response.statusCode),
+        message: _errorMessage(response.statusCode),
       );
     }
     if (responseBody.trim().isEmpty) return null;
@@ -100,19 +100,24 @@ class ApiClient {
     return base.replace(path: '$basePath$suffix', query: null, fragment: null);
   }
 
-  String _errorMessage(String body, int statusCode) {
-    if (body.trim().isNotEmpty) {
-      try {
-        final decoded = jsonDecode(body);
-        if (decoded is Map<String, dynamic>) {
-          final detail =
-              decoded['detail'] ?? decoded['title'] ?? decoded['message'];
-          if (detail is String && detail.isNotEmpty) return detail;
+  String _errorMessage(int statusCode) {
+    switch (statusCode) {
+      case 400:
+      case 422:
+        return 'تعذر إكمال الطلب. راجع المعلومات وحاول مرة أخرى.';
+      case 401:
+        return 'تعذر التحقق من الجلسة. يرجى المحاولة مجددًا.';
+      case 403:
+        return 'لا تملك صلاحية تنفيذ هذا الطلب.';
+      case 404:
+        return 'لم يتم العثور على البيانات المطلوبة.';
+      case 409:
+        return 'تعارضت البيانات الحالية مع الطلب. حدّث البيانات ثم حاول مجددًا.';
+      default:
+        if (statusCode >= 500) {
+          return 'الخادم غير متاح حاليًا. حاول مرة أخرى لاحقًا.';
         }
-      } on FormatException {
-        // Fall through to a stable status-based message.
-      }
+        return 'تعذر إكمال الطلب. حاول مرة أخرى لاحقًا.';
     }
-    return 'فشل الطلب (HTTP $statusCode).';
   }
 }

@@ -101,24 +101,40 @@ void main() {
     expect(requests[2].headers['authorization'], 'Bearer test-id-token');
   });
 
-  test('surfaces HTTP errors without hiding the status code', () async {
-    final repository = RestChildProfilesRepository(
-      apiClient: _client(MockClient((_) async => _jsonResponse(
-            {'title': 'Unauthorized'},
-            401,
-          ))),
-    );
+  const serverDetail = 'SqlException: /srv/private/db child=ليان';
+  const safeHttpMessages = <int, String>{
+    400: 'تعذر إكمال الطلب. راجع المعلومات وحاول مرة أخرى.',
+    401: 'تعذر التحقق من الجلسة. يرجى المحاولة مجددًا.',
+    403: 'لا تملك صلاحية تنفيذ هذا الطلب.',
+    404: 'لم يتم العثور على البيانات المطلوبة.',
+    409: 'تعارضت البيانات الحالية مع الطلب. حدّث البيانات ثم حاول مجددًا.',
+    422: 'تعذر إكمال الطلب. راجع المعلومات وحاول مرة أخرى.',
+    418: 'تعذر إكمال الطلب. حاول مرة أخرى لاحقًا.',
+    500: 'الخادم غير متاح حاليًا. حاول مرة أخرى لاحقًا.',
+  };
+  for (final entry in safeHttpMessages.entries) {
+    test('uses a safe message for HTTP ${entry.key}', () async {
+      final client = _client(MockClient((_) async => _jsonResponse(
+            {'title': 'Internal response', 'detail': serverDetail},
+            entry.key,
+          )));
 
-    expect(
-      () => repository.list(),
-      throwsA(
-        isA<ApiException>()
-            .having((error) => error.type, 'type', ApiFailureType.http)
-            .having((error) => error.statusCode, 'statusCode', 401)
-            .having((error) => error.message, 'message', 'Unauthorized'),
-      ),
-    );
-  });
+      await expectLater(
+        client.get('/api/v1/children'),
+        throwsA(
+          isA<ApiException>()
+              .having((error) => error.type, 'type', ApiFailureType.http)
+              .having((error) => error.statusCode, 'statusCode', entry.key)
+              .having((error) => error.message, 'message', entry.value)
+              .having(
+                (error) => error.message.contains(serverDetail),
+                'contains server detail',
+                isFalse,
+              ),
+        ),
+      );
+    });
+  }
 
   test('maps response body stream failures to a network error', () async {
     final client = ApiClient(
