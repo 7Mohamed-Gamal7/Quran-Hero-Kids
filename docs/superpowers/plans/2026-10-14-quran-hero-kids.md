@@ -60,7 +60,7 @@
 - [x] إنشاء حل .NET بمشاريع Domain/Application/Infrastructure/Api واختبارات xUnit.
 - [x] إضافة Flutter skeleton عربي مع Riverpod واختبارات smoke للواجهة والتنقل.
 - [ ] إعداد GitHub Actions للبناء والاختبار وformat/lint. (لم يُرفع workflow لأن صلاحية GitHub الحالية رفضت إنشاء ملفات تحت `.github/workflows/`.)
-- [x] تعريف `/health` وإضافة اختبار تكاملي يعيد 200 وحالة `ok`.
+- [x] تعريف `/health` كفحص liveness يعيد 200 وحالة `ok`، وإضافة `/health/ready` للتحقق المحدود من اتصال DB مع اختبارات SQLite متاح وSQL Server محلي غير متاح؛ لا يثبت ذلك جاهزية المخطط أو النشر الحي.
 - [x] توثيق عقد API في OpenAPI v1 مع Bearer للمسارات المحمية واختبارات تكامل للـschema والاستجابات؛ Swagger متاح في Development/Testing فقط.
 - [ ] استكمال إعدادات التطوير عبر متغيرات البيئة، دون أسرار داخل Git.
 

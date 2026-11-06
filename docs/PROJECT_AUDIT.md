@@ -3,7 +3,7 @@
 **Original audit date:** 2026-10-18 (Africa/Cairo)
 **Original checkout:** branch `feat/firebase-parent-auth-audit`, commit `cd7720d650a995e0233cf0d38d8c5766286414b0` (`docs: record active child selection milestone`)
 **Original remote baseline:** `origin/master` matched the checkout at audit time.
-**Latest follow-up:** 2026-11-05; see dated follow-up sections below. Current execution history and test results are tracked in [`docs/TASKS.md`](TASKS.md).
+**Latest follow-up:** 2026-11-06; see dated follow-up sections below. Current execution history and test results are tracked in [`docs/TASKS.md`](TASKS.md).
 **Scope:** the dated sections record local source/document checks and tests as performed. This is not a production, Firebase, privacy-law, licensing, or deployment certification.
 
 ## Checkout and preserved changes
@@ -163,6 +163,14 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - Network tests passed **20/20**; full Flutter tests passed **40/40**; `flutter analyze` reported no issues; formatter found no changes in **25** files; `git diff --check` passed. .NET tests were not run because backend code did not change.
 - The review also confirmed open gates already tracked: release signing uses the debug configuration, `/health` is liveness-only and does not check DB readiness, Firebase client auth lacks approved installation/configuration, and no Quran content source is approved. A specific coverage gap for HTTP 409 and malformed successful responses in the study-session REST repository was recorded as P3.9. README now documents Flutter tests and analysis commands.
 - No Firebase credentials, Quran source/content, production database, live endpoint, paid resource, or child PII was used. No Android release artifact or deployment is claimed.
+
+## Follow-up verification on 2026-11-06
+
+- `fetch` confirmed a clean local `master` matching `origin/master` at `b29451a` before changes. A seven-area audit reviewed backend/API, Flutter/UX, privacy/security, tests, dependencies/platforms, documentation, and release readiness.
+- Confirmed `/health` was an unconditional 200 liveness response despite unavailable persistence. Added a separate anonymous `/health/ready` probe using `QuranHeroDbContext.Database.CanConnectAsync` with a two-second linked cancellation bound. It returns `{status: "ready"}` on successful connection and generic 503 on an unavailable connection/exception; it preserves caller cancellation. `/health` remains unchanged. The probe does not validate schema/migrations, configure orchestration, or establish production readiness.
+- Regression tests first failed with 404 for both healthy and unavailable cases, proving the route was absent. They now cover healthy in-memory SQLite, an intentionally closed local SQL Server loopback port `127.0.0.1:1`, preserved liveness behavior with unreachable SQL, and OpenAPI 200/503 responses without bearer auth. Targeted health/startup/OpenAPI tests passed **5/5**; full .NET suite passed **44/44**; `dotnet format --verify-no-changes --no-restore` and `git diff --check` passed. No external database was used.
+- Documentation review clarified that the Flutter offline event outbox is planned, not implemented, and updated README, feature inventory, roadmap, security/debt docs, and the phase plan to bound readiness claims. The same audit found an independent client issue: network and malformed-JSON error messages still interpolate raw runtime exception details; it is tracked as open under P3.2. P3.4 remains open for schema/deployment verification, Firebase/Azure environments, monitoring, backup/restore, and rollback.
+- No Firebase credentials, Quran text/audio, live service, production/shared database, paid resource, or real child PII was used. No migration, deployment, release artifact, or production-readiness claim is made.
 
 ## Priority findings from the original audit (2026-10-18)
 
