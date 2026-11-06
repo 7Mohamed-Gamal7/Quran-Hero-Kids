@@ -26,6 +26,11 @@ public sealed class OpenApiContractTests : IClassFixture<IntegrationTestFactory>
         Assert.Equal("v1", root.GetProperty("info").GetProperty("version").GetString());
 
         var paths = root.GetProperty("paths");
+        var readiness = paths.GetProperty("/health/ready").GetProperty("get");
+        AssertHasResponse(readiness, "200");
+        AssertHasResponse(readiness, "503");
+        Assert.False(readiness.TryGetProperty("security", out _));
+
         var childrenGet = paths.GetProperty("/api/v1/children").GetProperty("get");
         AssertBearerRequired(childrenGet);
         AssertHasResponse(childrenGet, "200");

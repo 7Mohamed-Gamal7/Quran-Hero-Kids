@@ -17,6 +17,17 @@ public sealed class ProductionStartupTests
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
+    [Fact]
+    public async Task Readiness_WhenDatabaseIsUnreachable_ReturnsServiceUnavailable()
+    {
+        using var factory = new ProductionApiFactory();
+        using var client = factory.CreateClient();
+
+        using var response = await client.GetAsync("/health/ready");
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+    }
+
     private sealed class ProductionApiFactory : WebApplicationFactory<Program>
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)

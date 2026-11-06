@@ -66,6 +66,35 @@ app.MapGet("/health", () => Results.Ok(new HealthResponse("ok")))
     .WithName("GetHealth")
     .WithTags("System");
 
+app.MapGet("/health/ready", async (QuranHeroDbContext db, CancellationToken requestAborted) =>
+    {
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+        using var probeCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+            requestAborted,
+            timeout.Token);
+
+        try
+        {
+            var canConnect = await db.Database.CanConnectAsync(probeCancellation.Token);
+            return canConnect
+                ? Results.Ok(new HealthResponse("ready"))
+                : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+        }
+        catch (OperationCanceledException) when (requestAborted.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+        }
+    })
+    .Produces<HealthResponse>(StatusCodes.Status200OK)
+    .Produces(StatusCodes.Status503ServiceUnavailable)
+    .AllowAnonymous()
+    .WithName("GetReadiness")
+    .WithTags("System");
+
 app.Run();
 
 public sealed record HealthResponse(string Status);
