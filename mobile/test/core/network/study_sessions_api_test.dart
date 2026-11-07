@@ -7,6 +7,7 @@ import 'package:http/testing.dart';
 import 'package:quran_hero_kids/src/core/auth/token_provider.dart';
 import 'package:quran_hero_kids/src/core/network/api_client.dart';
 import 'package:quran_hero_kids/src/core/network/api_config.dart';
+import 'package:quran_hero_kids/src/core/network/api_exception.dart';
 import 'package:quran_hero_kids/src/features/study/data/study_sessions_repository.dart';
 import 'package:quran_hero_kids/src/features/study/domain/study_session.dart';
 
@@ -111,6 +112,72 @@ void main() {
     expect(request.headers['authorization'], 'Bearer test-id-token');
     expect(summary.sessionCount, 31);
     expect(summary.totalDurationSeconds, 496);
+  });
+
+  test('maps an HTTP 409 record conflict to a typed safe API error', () async {
+    const privateDetail = 'constraint=ClientEventId /srv/private/db';
+    final repository = RestStudySessionsRepository(
+      apiClient: _client(MockClient((_) async => _jsonResponse({
+            'title': 'Conflict',
+            'detail': privateDetail,
+          }, 409))),
+    );
+    final draft = StudySessionDraft(
+      clientEventId: _eventId,
+      kind: StudySessionKind.memorization,
+      durationSeconds: 65,
+      occurredAt: DateTime.utc(2026, 10, 15, 5),
+    );
+
+    await expectLater(
+      repository.record(_childId, draft),
+      throwsA(isA<ApiException>()
+          .having((error) => error.type, 'type', ApiFailureType.http)
+          .having((error) => error.statusCode, 'status code', 409)
+          .having(
+            (error) => error.userMessage,
+            'safe message',
+            'تعارضت البيانات الحالية مع الطلب. حدّث البيانات ثم حاول مجددًا.',
+          )
+          .having(
+            (error) => error.message.contains(privateDetail),
+            'does not contain server detail',
+            isFalse,
+          )),
+    );
+  });
+
+  test('maps malformed successful JSON to a typed decoding error', () async {
+    const privateDetail = 'decoder-path=/srv/private/session';
+    final repository = RestStudySessionsRepository(
+      apiClient: _client(MockClient((_) async => http.Response(
+            'not-json-$privateDetail',
+            200,
+          ))),
+    );
+    final draft = StudySessionDraft(
+      clientEventId: _eventId,
+      kind: StudySessionKind.memorization,
+      durationSeconds: 65,
+      occurredAt: DateTime.utc(2026, 10, 15, 5),
+    );
+
+    await expectLater(
+      repository.record(_childId, draft),
+      throwsA(isA<ApiException>()
+          .having((error) => error.type, 'type', ApiFailureType.decoding)
+          .having((error) => error.statusCode, 'status code', 200)
+          .having(
+            (error) => error.userMessage,
+            'safe message',
+            'تعذر قراءة استجابة الخادم. حاول مرة أخرى لاحقًا.',
+          )
+          .having(
+            (error) => error.message.contains(privateDetail),
+            'does not contain decoder detail',
+            isFalse,
+          )),
+    );
   });
 
   test('generates a version 4 UUID event id', () {
