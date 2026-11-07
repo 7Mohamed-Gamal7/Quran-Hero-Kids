@@ -3,7 +3,7 @@
 **Original audit date:** 2026-10-18 (Africa/Cairo)
 **Original checkout:** branch `feat/firebase-parent-auth-audit`, commit `cd7720d650a995e0233cf0d38d8c5766286414b0` (`docs: record active child selection milestone`)
 **Original remote baseline:** `origin/master` matched the checkout at audit time.
-**Latest follow-up:** 2026-11-06; see dated follow-up sections below. Current execution history and test results are tracked in [`docs/TASKS.md`](TASKS.md).
+**Latest follow-up:** 2026-11-07; see dated follow-up sections below. Current execution history and test results are tracked in [`docs/TASKS.md`](TASKS.md).
 **Scope:** the dated sections record local source/document checks and tests as performed. This is not a production, Firebase, privacy-law, licensing, or deployment certification.
 
 ## Checkout and preserved changes
@@ -171,6 +171,14 @@ This audit adds Android INTERNET permission to the main manifest and audit/setup
 - Regression tests first failed with 404 for both healthy and unavailable cases, proving the route was absent. They now cover healthy in-memory SQLite, an intentionally closed local SQL Server loopback port `127.0.0.1:1`, preserved liveness behavior with unreachable SQL, and OpenAPI 200/503 responses without bearer auth. Targeted health/startup/OpenAPI tests passed **5/5**; full .NET suite passed **44/44**; `dotnet format --verify-no-changes --no-restore` and `git diff --check` passed. No external database was used.
 - Documentation review clarified that the Flutter offline event outbox is planned, not implemented, and updated README, feature inventory, roadmap, security/debt docs, and the phase plan to bound readiness claims. The same audit found an independent client issue: network and malformed-JSON error messages still interpolate raw runtime exception details; it is tracked as open under P3.2. P3.4 remains open for schema/deployment verification, Firebase/Azure environments, monitoring, backup/restore, and rollback.
 - No Firebase credentials, Quran text/audio, live service, production/shared database, paid resource, or real child PII was used. No migration, deployment, release artifact, or production-readiness claim is made.
+
+## Follow-up verification on 2026-11-07
+
+- `fetch` confirmed a clean local `master` synchronized with `origin/master` at `13dd20a` before changes. A seven-area structural review covered backend, Flutter/UX, security/privacy, tests, dependencies/platforms, documentation, and release readiness.
+- Flutter had a remaining error-presentation gap: transport/JSON failures and locally generated configuration/authentication errors could place diagnostic strings in `ApiException.message`, which the child-profile screen displayed verbatim. The client now categorizes these failures and exposes fixed Arabic `userMessage` values; the family screen uses that safe presentation property. HTTP status mappings remain stable and server-provided details are not rendered.
+- Regression tests inject synthetic internal paths into HTTP, response-stream, malformed-JSON, configuration, and authentication failures; the screen test verifies that `API_BASE_URL` and the private path are absent from the visible error state. Networking tests passed **22/22**, family-screen tests **7/7**, and full Flutter tests **42/42**. `flutter analyze` reported no issues; formatter found no changes across **25** Dart files; `git diff --check` passed. Code is committed as `10bcb3c`.
+- Backend source was unchanged and .NET tests were not rerun; the latest recorded full backend suite remains **44/44** from 2026-11-06. Documentation was reconciled across `TASKS.md`, feature inventory, security, architecture, and roadmap. P3.2 remains open for its other controls; P3.4, P3.7, P3.9, Firebase credentials/package permission, Quran-source approval, release signing, CI permissions, and operational readiness remain unresolved.
+- No Firebase credentials, Quran text/audio, real child PII, production database, live endpoint, paid resource, migration, deployment, or release artifact was used or changed.
 
 ## Priority findings from the original audit (2026-10-18)
 
