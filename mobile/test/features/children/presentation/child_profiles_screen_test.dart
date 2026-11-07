@@ -66,15 +66,16 @@ void main() {
     );
   });
 
-  testWidgets('shows a clear configuration error and retry action',
+  testWidgets('shows a safe configuration error and retry action',
       (tester) async {
+    const internalError = 'API_BASE_URL missing /srv/private/child-data';
     await tester.pumpWidget(
       _testApp(
         _FakeChildrenRepository(
           [],
           failure: const ApiException(
             type: ApiFailureType.configuration,
-            message: 'عنوان API غير مهيأ. شغّل التطبيق مع API_BASE_URL.',
+            message: internalError,
           ),
         ),
       ),
@@ -82,9 +83,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      find.text('عنوان API غير مهيأ. شغّل التطبيق مع API_BASE_URL.'),
+      find.text('الخدمة غير مهيأة حاليًا. يرجى المحاولة لاحقًا.'),
       findsOneWidget,
     );
+    expect(find.text(internalError), findsNothing);
     expect(find.text('إعادة المحاولة'), findsOneWidget);
   });
 

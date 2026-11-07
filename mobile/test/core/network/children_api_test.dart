@@ -23,10 +23,12 @@ ApiClient _client(MockClient client) => ApiClient(
     );
 
 class _FailingResponseBodyClient extends http.BaseClient {
+  static const detail = 'socket-private-root=/srv/child-data';
+
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async =>
       http.StreamedResponse(
-        Stream<List<int>>.error(const SocketException('connection reset')),
+        Stream<List<int>>.error(const SocketException(detail)),
         200,
       );
 }
@@ -126,6 +128,7 @@ void main() {
               .having((error) => error.type, 'type', ApiFailureType.http)
               .having((error) => error.statusCode, 'statusCode', entry.key)
               .having((error) => error.message, 'message', entry.value)
+              .having((error) => error.userMessage, 'userMessage', entry.value)
               .having(
                 (error) => error.message.contains(serverDetail),
                 'contains server detail',
@@ -145,11 +148,80 @@ void main() {
 
     await expectLater(
       client.get('/api/v1/children'),
-      throwsA(isA<ApiException>().having(
-        (error) => error.type,
-        'type',
-        ApiFailureType.network,
-      )),
+      throwsA(isA<ApiException>()
+          .having(
+            (error) => error.type,
+            'type',
+            ApiFailureType.network,
+          )
+          .having(
+            (error) => error.message,
+            'message',
+            'تعذر الاتصال بالخادم. تحقق من اتصال الإنترنت وحاول مرة أخرى.',
+          )
+          .having(
+            (error) =>
+                error.message.contains(_FailingResponseBodyClient.detail),
+            'contains socket detail',
+            isFalse,
+          )),
+    );
+  });
+
+  test('does not expose malformed JSON details in decoding errors', () async {
+    const privateDetail = 'decode-private-root=/srv/child-data';
+    final client = _client(MockClient((_) async => http.Response(
+          'not-json-$privateDetail',
+          200,
+        )));
+
+    await expectLater(
+      client.get('/api/v1/children'),
+      throwsA(isA<ApiException>()
+          .having((error) => error.type, 'type', ApiFailureType.decoding)
+          .having(
+            (error) => error.message,
+            'message',
+            'تعذر قراءة استجابة الخادم. حاول مرة أخرى لاحقًا.',
+          )
+          .having(
+            (error) => error.message.contains(privateDetail),
+            'contains decoder detail',
+            isFalse,
+          )),
+    );
+  });
+
+  test('uses safe presentation messages for local API failures', () {
+    const privateDetail = 'private-runtime-detail=/srv/child-data';
+    final failures = [
+      ApiException(
+        type: ApiFailureType.configuration,
+        message: 'API_BASE_URL missing $privateDetail',
+      ),
+      ApiException(
+        type: ApiFailureType.authentication,
+        message: 'Firebase ID token absent $privateDetail',
+      ),
+      ApiException(
+        type: ApiFailureType.network,
+        message: 'SocketException $privateDetail',
+      ),
+      ApiException(
+        type: ApiFailureType.decoding,
+        message: 'FormatException $privateDetail',
+      ),
+    ];
+
+    expect(failures.map((failure) => failure.userMessage), [
+      'الخدمة غير مهيأة حاليًا. يرجى المحاولة لاحقًا.',
+      'تعذر التحقق من الجلسة. يرجى تسجيل الدخول مجددًا.',
+      'تعذر الاتصال بالخادم. تحقق من اتصال الإنترنت وحاول مرة أخرى.',
+      'تعذر قراءة استجابة الخادم. حاول مرة أخرى لاحقًا.',
+    ]);
+    expect(
+      failures.any((failure) => failure.userMessage.contains(privateDetail)),
+      isFalse,
     );
   });
 

@@ -39,7 +39,7 @@ class ApiClient {
     if (!_config.isConfigured) {
       throw const ApiException(
         type: ApiFailureType.configuration,
-        message: 'عنوان API غير مهيأ. شغّل التطبيق مع API_BASE_URL.',
+        message: 'الخدمة غير مهيأة حاليًا. يرجى المحاولة لاحقًا.',
       );
     }
 
@@ -47,7 +47,7 @@ class ApiClient {
     if (token == null || token.isEmpty) {
       throw const ApiException(
         type: ApiFailureType.authentication,
-        message: 'لم يتم توفير Firebase ID token.',
+        message: 'تعذر التحقق من الجلسة. يرجى تسجيل الدخول مجددًا.',
       );
     }
 
@@ -64,10 +64,10 @@ class ApiClient {
     try {
       response = await _httpClient.send(request);
       responseBody = await response.stream.bytesToString();
-    } on Exception catch (error) {
+    } on Exception {
       throw ApiException(
         type: ApiFailureType.network,
-        message: 'تعذر الاتصال بالخادم: $error',
+        message: 'تعذر الاتصال بالخادم. تحقق من اتصال الإنترنت وحاول مرة أخرى.',
       );
     }
 
@@ -75,18 +75,18 @@ class ApiClient {
       throw ApiException(
         type: ApiFailureType.http,
         statusCode: response.statusCode,
-        message: _errorMessage(response.statusCode),
+        message: ApiException.userMessageForHttpStatus(response.statusCode),
       );
     }
     if (responseBody.trim().isEmpty) return null;
 
     try {
       return jsonDecode(responseBody);
-    } on FormatException catch (error) {
+    } on FormatException {
       throw ApiException(
         type: ApiFailureType.decoding,
         statusCode: response.statusCode,
-        message: 'استجابة الخادم ليست JSON صالحًا: $error',
+        message: 'تعذر قراءة استجابة الخادم. حاول مرة أخرى لاحقًا.',
       );
     }
   }
@@ -98,26 +98,5 @@ class ApiClient {
         : base.path;
     final suffix = path.startsWith('/') ? path : '/$path';
     return base.replace(path: '$basePath$suffix', query: null, fragment: null);
-  }
-
-  String _errorMessage(int statusCode) {
-    switch (statusCode) {
-      case 400:
-      case 422:
-        return 'تعذر إكمال الطلب. راجع المعلومات وحاول مرة أخرى.';
-      case 401:
-        return 'تعذر التحقق من الجلسة. يرجى المحاولة مجددًا.';
-      case 403:
-        return 'لا تملك صلاحية تنفيذ هذا الطلب.';
-      case 404:
-        return 'لم يتم العثور على البيانات المطلوبة.';
-      case 409:
-        return 'تعارضت البيانات الحالية مع الطلب. حدّث البيانات ثم حاول مجددًا.';
-      default:
-        if (statusCode >= 500) {
-          return 'الخادم غير متاح حاليًا. حاول مرة أخرى لاحقًا.';
-        }
-        return 'تعذر إكمال الطلب. حاول مرة أخرى لاحقًا.';
-    }
   }
 }

@@ -368,7 +368,7 @@ class _ChildProfileDialogState extends State<_ChildProfileDialog> {
 }
 
 String _friendlyError(Object error) {
-  if (error is ApiException) return error.message;
+  if (error is ApiException) return error.userMessage;
   return 'حدث خطأ غير متوقع. تحقّق من الاتصال وحاول مرة أخرى.';
 }
 
